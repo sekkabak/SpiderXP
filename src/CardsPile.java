@@ -31,4 +31,26 @@ public class CardsPile {
             offset += this.pileOffset;
         }
     }
+
+    public boolean isEmpty() {
+        return this.pile.isEmpty();
+    }
+
+    public Card getCard(int index) {
+        return this.pile.get(index);
+    }
+
+    public Card removeCard(int index) {
+        return this.pile.remove(index);
+    }
+
+    public Card removeCard() {
+        return this.pile.remove(this.pile.size() - 1);
+    }
+
+    public void translate(int x, int y) {
+        this.x += x;
+        this.y += y;
+        this.pile.forEach(a -> a.translate(x, y));
+    }
 }

@@ -1,30 +1,36 @@
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-public class Card {
+/**
+ * Class for card object
+ * <p>
+ * Rank in number reprezentation:
+ * First number
+ * Ace = 1
+ * 2 = 2
+ * ...
+ * 10 = 10
+ * Jack = 11
+ * Queen = 12
+ * King = 13
+ * Second number
+ * 1 - club
+ * 2 - spade
+ * 3 - heart
+ * 4 - diamond
+ */
+public class Card extends Rectangle {
+    public int rank;
+
     public static final int cardWidth = 71;
     public static final int cardHeight = 96;
 
     final private BufferedImage image;
     final private BufferedImage backImage;
     private boolean isFaceDown;
-    /**
-     * First number
-     *  Ace = 1
-     *  2 = 2
-     *  ...
-     *  10 = 10
-     *  Jack = 11
-     *  Queen = 12
-     *  King = 13
-     * Second number
-     *  1 - club
-     *  2 - spade
-     *  3 - heart
-     *  4 - diamond
-     */
-    private int rank;
+    private boolean locked = true;
 
     public Card(int rank, boolean isFaceDown) {
         this.rank = rank;
@@ -41,7 +47,7 @@ public class Card {
         BufferedImage img = null;
 
         try {
-            img = ImageIO.read(getClass().getResourceAsStream("/images/"+fileName));
+            img = ImageIO.read(getClass().getResourceAsStream("/images/" + fileName));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -63,5 +69,13 @@ public class Card {
 
     public int getRank() {
         return rank;
+    }
+
+    public void unlock() {
+        locked = !locked;
+    }
+
+    public boolean isClicked(int x, int y) {
+        return (!locked && x > this.x && x < (this.x + Card.cardWidth)) && (y > this.y && y < (this.y + Card.cardHeight));
     }
 }
