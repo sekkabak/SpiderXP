@@ -15,7 +15,7 @@ import java.io.IOException;
  * Jack = 11
  * Queen = 12
  * King = 13
- * Second number
+ * Second number (suit)
  * 1 - club
  * 2 - spade
  * 3 - heart
@@ -30,13 +30,17 @@ public class Card extends Rectangle {
     final private BufferedImage image;
     final private BufferedImage backImage;
     private boolean isFaceDown;
-    private boolean locked = true;
+    private boolean locked;
 
     public Card(int rank, boolean isFaceDown) {
+        this.width = Card.cardWidth;
+        this.height = Card.cardHeight;
+
         this.rank = rank;
         this.image = loadImageByRank(rank);
         this.backImage = loadImage("back1.png");
         this.isFaceDown = isFaceDown;
+        this.locked = true;
     }
 
     private BufferedImage loadImageByRank(int rank) {
@@ -71,10 +75,27 @@ public class Card extends Rectangle {
         return rank;
     }
 
-    public void unlock() {
-        locked = !locked;
+    public int getCardValue() {
+        return getRank() / 10;
     }
 
+    public int getSuit() {
+        return getRank() - (getCardValue() * 10);
+    }
+
+    public void unlock() {
+        locked = false;
+    }
+
+    public void lock() {
+        locked = true;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    // TODO czy to będzie potrzebne?
     public boolean isClicked(int x, int y) {
         return (!locked && x > this.x && x < (this.x + Card.cardWidth)) && (y > this.y && y < (this.y + Card.cardHeight));
     }
