@@ -47,17 +47,7 @@ public class Card extends Rectangle {
         return loadImage(rank + ".png");
     }
 
-    private BufferedImage loadImage(String fileName) {
-        BufferedImage img = null;
 
-        try {
-            img = ImageIO.read(getClass().getResourceAsStream("/images/" + fileName));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-        return img;
-    }
 
     public BufferedImage getImage() {
         return isFaceDown ? backImage : image;
@@ -95,8 +85,7 @@ public class Card extends Rectangle {
         return locked;
     }
 
-    // TODO czy to będzie potrzebne?
-    public boolean isClicked(int x, int y) {
-        return (!locked && x > this.x && x < (this.x + Card.cardWidth)) && (y > this.y && y < (this.y + Card.cardHeight));
+    public void hide() {
+        isFaceDown = true;
     }
 }

@@ -4,7 +4,7 @@ public class DrawPile extends CardsPile {
     protected final int pileOffset = 12;
 
     public DrawPile(int windowWidth, int windowHeight) {
-        super(windowWidth - 45, windowHeight - 50);
+        super(windowWidth - 45, windowHeight - 70);
     }
 
     @Override

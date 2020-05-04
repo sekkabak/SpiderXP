@@ -1,25 +1,16 @@
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class CardsPile {
     protected final List<Card> pile;
-
-    // przesunięcie kart na stosie
     protected final int pileOffset = 7;
     public int x, y;
-
 
     public CardsPile(int x, int y) {
         this.x = x;
         this.y = y;
         this.pile = new ArrayList<Card>();
-    }
-
-    // TODO to jest potrzebne?
-    public List<Card> getPile() {
-        return pile;
     }
 
     public void addCard(Card card) {
@@ -82,15 +73,7 @@ public class CardsPile {
     }
 
     public Card removeCard() {
-        Card card = this.pile.remove(this.pile.size() - 1);
-        if (!this.pile.isEmpty()) {
-            // by removing and adding I prevent blocking segments
-            Card newTop = this.pile.remove(this.pile.size() - 1);
-            if (newTop.isFaceDown())
-                newTop.flip();
-            addCard(newTop);
-        }
-        return card;
+        return this.pile.remove(this.pile.size() - 1);
     }
 
     private void lockAll() {
@@ -114,6 +97,26 @@ public class CardsPile {
             return null;
 
         return pile.get(pile.size() - 1);
+    }
+
+    /**
+     * Fixes pile when
+     * - Top card is locked and hidden
+     *
+     */
+    public void fixPile() {
+        Card topCard = getLastCard();
+        if (topCard != null) {
+            removeCard();   // removes card to check
+
+            if(topCard.isFaceDown())
+                topCard.flip();
+
+            if(topCard.isLocked())
+                topCard.unlock();
+
+            addCard(topCard);
+        }
     }
 
     /**
@@ -159,23 +162,32 @@ public class CardsPile {
      */
     public int checkIfDeckIsComplete() {
         int completePoints = 0;     // 13 is full
-        int actualSuit = pile.get(0).getSuit();
+        int actualSuit = pile.get(0).getSuit();;
         int actualCardValue = 13;
         int limit = pile.size();
         for (int i = 0; i < limit; i++) {
             Card card = pile.get(i);
-            if (card.getCardValue() == actualCardValue && card.getSuit() == actualSuit) {
+            // KING begins sequence
+            if(card.getCardValue() == 13) {
+                actualSuit = card.getSuit();
                 completePoints++;
                 actualCardValue--;
-            } else {
+            }
+            // rest of cards from 12 to 1
+            else if (card.getCardValue() == actualCardValue && card.getSuit() == actualSuit) {
+                completePoints++;
+                actualCardValue--;
+            }
+            // sequence break
+            else {
                 completePoints = 0;
                 actualCardValue = 13;
             }
 
             if (completePoints == 13) {
-                while(true) {
+                while (true) {
                     card = pile.remove(i);
-                    if(card.getCardValue() == 13)
+                    if (card.getCardValue() == 13)
                         return actualSuit;
                     i--;
                 }

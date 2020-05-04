@@ -23,7 +23,7 @@ public class CustomMouseAdapter extends MouseAdapter {
         int y = e.getY();
 
         // check for draw request in draw area
-        if (x > Game.windowWidth - 175 && y > Game.windowHeight - 150 && x < Game.windowWidth - 25 && y < Game.windowHeight - 45) {
+        if (x > Game.windowWidth - 175 && y > Game.windowHeight - 175 && x < Game.windowWidth - 25 && y < Game.windowHeight - 45) {
             game.makeADeal();
             gamePanel.repaint();
             return;
@@ -79,30 +79,26 @@ public class CustomMouseAdapter extends MouseAdapter {
             // if cursor was on pile
             if (x > pile.x && x < (pile.x + Card.cardWidth) && y > pile.y && y < pileHeight) {
                 Card a = pile.getLastCard();                // top card from pile
-                Card b = game.dragPile.pile.get(0);       // lower card from hand
+                Card b = game.dragPile.pile.get(0);         // lower card from hand
                 // check is cards has proper order
-                if (a == null || (a.getSuit() == b.getSuit() && a.getCardValue() == (b.getCardValue() + 1))) {
+                if (a == null ||  a.getCardValue() == (b.getCardValue() + 1)) {
                     // move cards from hand to new pile
                     int limit = game.dragPile.size();
                     for (int i = 0; i < limit; i++) {
                         pile.addCard(game.dragPile.removeFirstCard());
                     }
-                    gamePanel.repaint();
                     int suit = pile.checkIfDeckIsComplete();
                     if (suit != -1) {
                         game.finishedPile.addCard(new Card(130 + suit, false));
-//                        game.finishedPile.addCard(new Card(130 + suit, false));
-//                        game.finishedPile.addCard(new Card(130 + suit, false));
-//                        game.finishedPile.addCard(new Card(130 + suit, false));
-//                        game.finishedPile.addCard(new Card(130 + suit, false));
-//                        game.finishedPile.addCard(new Card(130 + suit, false));
-//                        game.finishedPile.addCard(new Card(130 + suit, false));
-//                        game.finishedPile.addCard(new Card(130 + suit, false));
                     }
                     if(game.finishedPile.isAllDone())
                     {
                         game.victory();
                     }
+
+                    // check piles for fliping needed or unlocking
+                    game.checkPiles();
+
                     gamePanel.repaint();
                     return;
                 }
