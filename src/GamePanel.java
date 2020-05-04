@@ -11,19 +11,21 @@ public class GamePanel extends JPanel {
         CustomMouseAdapter mouseAdapter = new CustomMouseAdapter(this.game, this);
         addMouseListener(mouseAdapter);
         addMouseMotionListener(mouseAdapter);
-
-//        super.setDoubleBuffered(true);
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        paintPilesHolders(g);
+        g.setColor(Color.BLACK);
+        g.drawRect((Game.windowWidth-200)/2, Game.windowHeight-200,200,100);
+        g.setColor(new Color(0x075c1d));
+        g.fillRect((Game.windowWidth-200)/2+1, Game.windowHeight-200+1,199,99);
+        g.setColor(Color.WHITE);
+        g.drawString("Score: "+ game.points, (Game.windowWidth-100)/2, Game.windowHeight-150);
+        g.drawString("Moves: "+ game.moves, (Game.windowWidth-100)/2, Game.windowHeight-135);
 
-//        // TODO
-//        g.setColor(Color.RED);
-//        g.drawRect(Game.windowWidth-175,Game.windowHeight-150,151,106);
+        paintPilesHolders(g);
 
         for (CardsPile pile : game.allPiles) {
             pile.paintPile(g);

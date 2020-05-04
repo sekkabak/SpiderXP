@@ -1,7 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -9,14 +7,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public class Game extends JFrame implements ActionListener {
+public class Game extends JFrame {
     public static final int windowWidth = 1150;
     public static final int windowHeight = 700;
 
     private static final int pilesSpacing = 40;
 
     private static final Color boardColor = new Color(0x10782b);
-    final private BufferedImage backImage = Helper.loadImage("back1.png");
+    public static final BufferedImage backImage = Helper.loadImage("back1.png");
 
     private final GamePanel panel;
 
@@ -24,25 +22,42 @@ public class Game extends JFrame implements ActionListener {
     // <suit, rank>
     public HashMap<CardID, Card> cards = new HashMap<>();
 
-    public List<Card> allCards = new ArrayList<>();
-    private List<Card> allCardsCopy;
+    public List<Card> gameCards = new ArrayList<>();
+    public List<Card> gameCardsCopy = new ArrayList<>();
+
     public List<CardsPile> allPiles = new ArrayList<>();
     public DrawPile drawPile = new DrawPile(Game.windowWidth, Game.windowHeight);
     public CardsPile dragPile = new CardsPile(0, 0);
     public FinishedPile finishedPile = new FinishedPile(Game.windowWidth, Game.windowHeight);
 
+    public long moves = 0;
     public long points = 0;
+    public boolean canRestart = false;
+
     public int difficulty = 5; // 2,3,5
 
     private Actions actions;
 
     private JMenuBar menuBar = new JMenuBar();
     private JMenu menu = new JMenu("Game");
+    JMenuItem restartGame;
 
-    // TODO zrobić generowanie każdej możliwej karty na samym początku a potem tylko je kopiować
+    // TODO nie zawsze działa składanie talii zdj na pulpicie
+
+    // TODO rozdzielić losowość
+    // TODO zrobić automatycze odstepy pomiedzy kartami np jeśli stos jest duży
+
+
+    // TODO
+//    long start = System.nanoTime();
+//    long elapsedTime = System.nanoTime() - start;
+//    System.out.println("Czas: " + (elapsedTime * 0.000000001) + "s");
 
     public Game() {
+        generateCards();
+
         setMinimumSize(new Dimension(windowWidth, windowHeight));
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         setResizable(false);
@@ -58,18 +73,31 @@ public class Game extends JFrame implements ActionListener {
         setContentPane(panel);
         generatePiles();
 
-//        newGame();
-
         // TODO DEBUG
+//        Card card;
 //        CardsPile debug1 = allPiles.get(0);
-//        debug1.addCard(new Card(12, true));
-//        for (int i = 131; i > 11; i -= 10) {
-//            debug1.addCard(new Card(i, false));
+//////        debug1.addCard(cards.get(new CardID(2, 1)).getUnlockedAndVisible());
+//        for (int i = 13; i > 1; i -= 1) {
+//            card = (Card) cards.get(new CardID(1, i)).clone();
+//            debug1.addCard(card.getUnlockedAndVisible());
+//        }
+//        for (int i = 13; i > 1; i -= 1) {
+//            card = (Card) cards.get(new CardID(1, i)).clone();
+//            debug1.addCard(card.getUnlockedAndVisible());
 //        }
 //        CardsPile debug2 = allPiles.get(1);
-//        debug2.addCard(new Card(11, false));
+//        card = (Card) cards.get(new CardID(1, 1)).clone();
+//        debug2.addCard(card.getUnlockedAndVisible());
 //        CardsPile debug3 = allPiles.get(2);
-//        debug3.addCard(new Card(22, false));
+//        card = (Card) cards.get(new CardID(2, 2)).clone();
+//        debug3.addCard(card.getUnlockedAndVisible());
+
+        setVisible(true);
+        openDifficultyDialog();
+    }
+
+    public void openDifficultyDialog() {
+        actions.difficultyDialog.changeDifficulty();
     }
 
     /**
@@ -77,7 +105,7 @@ public class Game extends JFrame implements ActionListener {
      */
     private void setMenu() {
         JMenuItem newGame = new JMenuItem("New Game", KeyEvent.VK_F2);
-        JMenuItem restartGame = new JMenuItem("Restart This Game");
+        restartGame = new JMenuItem("Restart This Game");
         JMenuItem undo = new JMenuItem("Undo");
         JMenuItem deal = new JMenuItem("Deal Next Row");
         JMenuItem tip = new JMenuItem("Show An Available Move");
@@ -96,23 +124,24 @@ public class Game extends JFrame implements ActionListener {
 
         restartGame.setAction(actions.restartGame);
 
+        undo.setEnabled(false);
+
+        deal.setAction(actions.deal);
+
+        tip.setEnabled(false);
+
         difficulty.setMnemonic(KeyEvent.VK_F3);
         actions.difficulty.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_F3);
         difficulty.setAction(actions.difficulty);
         difficulty.setAccelerator(KeyStroke.getKeyStroke("F3"));
 
+        statistics.setEnabled(false);
+        options.setEnabled(false);
+        save.setEnabled(false);
+        openSave.setEnabled(false);
 
-//        newGame.addActionListener(this);
-//        restartGame.addActionListener(this);
-//        undo.addActionListener(this);
-//        deal.addActionListener(this);
-//        tip.addActionListener(this);
-//        difficulty.addActionListener(this);
-//        statistics.addActionListener(this);
-//        options.addActionListener(this);
-//        save.addActionListener(this);
-//        openSave.addActionListener(this);
-//        exit.addActionListener(this);
+        gitHub.setAction(actions.gitHub);
+        exit.setAction(actions.exit);
 
         menu.add(newGame);
         menu.add(restartGame);
@@ -135,40 +164,38 @@ public class Game extends JFrame implements ActionListener {
         menuBar.add(menu);
     }
 
-    private void generateGameCards() {
-        long start = System.nanoTime();
-
+    /**
+     * Generates all cards for future coping etc
+     */
+    private void generateCards() {
         // i card type
         // j card color
         // k deck number
         for (int i = 1, j = 1, k = 0; k < 8; i++) {
             if (i == 14) {
                 j++;
-                if (j == difficulty)
+                if (j == 5)
                     j = 1;
                 k++;
                 i = 1;
             }
             CardID id = new CardID(j, i);
-            Card card = new Card();
-            cards.put(, )
+            Card card = new Card(id, Helper.loadImage(id.hashCode() + ".png"), Game.backImage);
+            cards.put(id, card);
         }
-        Collections.shuffle(allCards);
-        allCardsCopy = new ArrayList<>(allCards);
-
-        long elapsedTime = System.nanoTime() - start;
-        System.out.println("Czas: " + (elapsedTime * 0.000000001) + "s");
     }
 
     /**
      * Resets actual game and starts new
      */
     public void newGame() {
+        resetMoves();
+
         // clears board
         clearPiles();
 
         // generates cards for game
-        generateDeck();
+        generateGameCards();
 
         // give cards for drawPile
         generateDrawPile();
@@ -184,19 +211,28 @@ public class Game extends JFrame implements ActionListener {
      * Resets actual game and starts new
      */
     public void restartGame() {
-        // TODO dodać dialog z potwierdzeniem czy chcesz jeszcze raz zagrać to rozdanie
+        if(moves == 0)
+            return;
+
+        if (JOptionPane.showConfirmDialog(null, "Are you sure you want to restart this game from the beginning?", "Restart",
+                JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        resetMoves();
+
         // clears board
         clearPiles();
 
         // restore previous cards generation
-        allCards = new ArrayList<>(allCardsCopy);
+        gameCards = new ArrayList<>(gameCardsCopy);
 
         // give cards for drawPile
         generateDrawPile();
 
         // hide and lock all remaining cards
-        for (Card card : allCards) {
-//            card.hide();
+        for (Card card : gameCards) {
+            card.hide();
             card.lock();
         }
 
@@ -208,10 +244,10 @@ public class Game extends JFrame implements ActionListener {
     }
 
     /**
-     * Clears ALL piles and deletes all cards
+     * Clears piles used in actual game
      */
     private void clearPiles() {
-        allCards.clear();
+        gameCards.clear();
         drawPile.pile.clear();
         dragPile.pile.clear();
         finishedPile.pile.clear();
@@ -223,29 +259,24 @@ public class Game extends JFrame implements ActionListener {
     /**
      * Generates all cards used in game
      */
-    private void generateDeck() {
-        allCards = new ArrayList<>();
+    private void generateGameCards() {
         // i card type
         // j card color
         // k deck number
+        gameCards = new ArrayList<>();
         for (int i = 1, j = 1, k = 0; k < 8; i++) {
-            if (i == 14) {
+            Card card = (Card) cards.get(new CardID(j, i)).clone();
+            gameCards.add(card);
+            if (i == 13) {
                 j++;
                 if (j == difficulty)
                     j = 1;
                 k++;
-                i = 1;
+                i = 0;
             }
-            // TODO optymalizacja
-//            long start = System.nanoTime();
-            {
-                allCards.add(new Card(Integer.parseInt(i + "" + j), false));
-            }
-//            long elapsedTime = System.nanoTime() - start;
-//            System.out.println("Czas: " + (elapsedTime * 0.000000001) + "s");
         }
-        Collections.shuffle(allCards);
-        allCardsCopy = new ArrayList<>(allCards);
+        Collections.shuffle(gameCards);
+        gameCardsCopy = new ArrayList<>(gameCards);
     }
 
     /**
@@ -263,16 +294,15 @@ public class Game extends JFrame implements ActionListener {
      * Fills main 10 piles from rest of the shuffled cards
      */
     private void dealTheCards() {
-        int limit = allCards.size();
+        int limit = gameCards.size();
+        int allPilesSize = allPiles.size();
         // adds each card to his pile and also removes from generated cards pile
         for (int i = limit - 1; i >= 0; i--) {
-            Card card = allCards.remove(i);
-            if (allCards.size() >= 10) {
-                card.flip();
+            if (i < 10) {
+                allPiles.get(i % allPilesSize).addCard(gameCards.remove(i).getUnlockedAndVisible());
             } else {
-                card.unlock();
+                allPiles.get(i % allPilesSize).addCard(gameCards.remove(i));
             }
-            allPiles.get(i % allPiles.size()).addCard(card);
         }
     }
 
@@ -281,7 +311,7 @@ public class Game extends JFrame implements ActionListener {
      */
     private void generateDrawPile() {
         for (int i = 0; i < 50; i++) {
-            drawPile.addCard(allCards.remove(i));
+            drawPile.addCard(gameCards.remove(i));
         }
     }
 
@@ -292,12 +322,16 @@ public class Game extends JFrame implements ActionListener {
         for (CardsPile cardsPile : allPiles) {
             cardsPile.fixPile();
         }
+        panel.repaint();
     }
 
     /**
      * Deals i pile from DrawPile
      */
     public void makeADeal() {
+        if (drawPile.pile.isEmpty())
+            return;
+
         for (CardsPile pile : allPiles) {
             if (pile.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "U can't deal with empty slots");
@@ -305,11 +339,12 @@ public class Game extends JFrame implements ActionListener {
             }
         }
 
-        if (!drawPile.pile.isEmpty()) {
-            for (CardsPile pile : allPiles) {
-                pile.addCard(drawPile.pile.remove(0));
-            }
+        for (CardsPile pile : allPiles) {
+            pile.addCard(drawPile.pile.remove(0).getUnlockedAndVisible());
         }
+
+        restartGame.setEnabled(true);
+        panel.repaint();
     }
 
     /**
@@ -319,9 +354,18 @@ public class Game extends JFrame implements ActionListener {
         JOptionPane.showMessageDialog(this, "Victory!");
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        // TODO
+    public void resetMoves() {
+        moves = 0;
+        points = 500;
+        restartGame.setEnabled(false);
+    }
 
+    public void makeMove() {
+        if(moves == 0)
+            restartGame.setEnabled(true);
+
+        moves++;
+        if(points>0)
+            points--;
     }
 }

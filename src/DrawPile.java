@@ -11,9 +11,8 @@ public class DrawPile extends CardsPile {
     public void paintPile(Graphics g) {
         int offset = 0;
         int limit = pile.size() / 10;
-        Card pileTop = new Card(11, true);
         for (int i = 0; i < limit; i++) {
-            g.drawImage(pileTop.getImage(), this.x - offset - Card.cardWidth, this.y - Card.cardHeight, null);
+            g.drawImage(Game.backImage, this.x - offset - Card.cardWidth, this.y - Card.cardHeight, null);
             offset += pileOffset;
         }
     }

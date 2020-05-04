@@ -1,28 +1,8 @@
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
-/**
- * Class for card object
- * <p>
- * Rank in number reprezentation:
- * First number
- * Ace = 1
- * 2 = 2
- * ...
- * 10 = 10
- * Jack = 11
- * Queen = 12
- * King = 13
- * Second number (suit)
- * 1 - club
- * 2 - spade
- * 3 - heart
- * 4 - diamond
- */
 public class Card extends Rectangle {
-    public int rank;
+    public CardID id;
 
     public static final int cardWidth = 71;
     public static final int cardHeight = 96;
@@ -32,22 +12,20 @@ public class Card extends Rectangle {
     private boolean isFaceDown;
     private boolean locked;
 
-    public Card(int rank, boolean isFaceDown) {
+    public Card(CardID id, BufferedImage image, BufferedImage backImage) {
         this.width = Card.cardWidth;
         this.height = Card.cardHeight;
 
-        this.rank = rank;
-        this.image = loadImageByRank(rank);
-        this.backImage = loadImage("back1.png");
-        this.isFaceDown = isFaceDown;
+        this.id = id;
+        this.image = image;
+        this.backImage = backImage;
+        this.isFaceDown = true;
         this.locked = true;
     }
 
-    private BufferedImage loadImageByRank(int rank) {
-        return loadImage(rank + ".png");
+    public CardID getId() {
+        return id;
     }
-
-
 
     public BufferedImage getImage() {
         return isFaceDown ? backImage : image;
@@ -56,36 +34,34 @@ public class Card extends Rectangle {
     public boolean isFaceDown() {
         return isFaceDown;
     }
-
-    public void flip() {
-        isFaceDown = !isFaceDown;
-    }
-
-    public int getRank() {
-        return rank;
-    }
-
-    public int getCardValue() {
-        return getRank() / 10;
-    }
-
-    public int getSuit() {
-        return getRank() - (getCardValue() * 10);
-    }
-
-    public void unlock() {
-        locked = false;
+    public boolean isLocked() {
+        return locked;
     }
 
     public void lock() {
         locked = true;
     }
-
-    public boolean isLocked() {
-        return locked;
+    public void unlock() {
+        locked = false;
     }
 
     public void hide() {
         isFaceDown = true;
+    }
+    public void show() {
+        isFaceDown = false;
+    }
+
+    public int getSuit() {
+        return id.getSuit();
+    }
+    public int getRank() {
+        return id.getRank();
+    }
+
+    public Card getUnlockedAndVisible() {
+        locked = false;
+        isFaceDown = false;
+        return this;
     }
 }

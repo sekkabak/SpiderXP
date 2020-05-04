@@ -34,4 +34,12 @@ public class CardID {
     public int hashCode() {
         return rank * 10 + suit;
     }
+
+    public int getSuit() {
+        return suit;
+    }
+
+    public int getRank() {
+        return rank;
+    }
 }

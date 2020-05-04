@@ -4,7 +4,7 @@ public class FinishedPile extends CardsPile {
     protected final int pileOffset = 50;
 
     public FinishedPile(int windowWidth, int windowHeight) {
-        super(-20, windowHeight - 50);
+        super(-25, windowHeight - 100);
     }
 
     @Override

@@ -81,7 +81,7 @@ public class CustomMouseAdapter extends MouseAdapter {
                 Card a = pile.getLastCard();                // top card from pile
                 Card b = game.dragPile.pile.get(0);         // lower card from hand
                 // check is cards has proper order
-                if (a == null ||  a.getCardValue() == (b.getCardValue() + 1)) {
+                if (a == null ||  a.getRank() == (b.getRank() + 1)) {
                     // move cards from hand to new pile
                     int limit = game.dragPile.size();
                     for (int i = 0; i < limit; i++) {
@@ -89,7 +89,9 @@ public class CustomMouseAdapter extends MouseAdapter {
                     }
                     int suit = pile.checkIfDeckIsComplete();
                     if (suit != -1) {
-                        game.finishedPile.addCard(new Card(130 + suit, false));
+                        game.points+=100;
+                        Card card = (Card) game.cards.get(new CardID(suit, 13)).clone();
+                        game.finishedPile.addCard(card.getUnlockedAndVisible());
                     }
                     if(game.finishedPile.isAllDone())
                     {
@@ -98,7 +100,7 @@ public class CustomMouseAdapter extends MouseAdapter {
 
                     // check piles for fliping needed or unlocking
                     game.checkPiles();
-
+                    game.makeMove();
                     gamePanel.repaint();
                     return;
                 }
