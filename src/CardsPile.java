@@ -154,13 +154,13 @@ public class CardsPile {
      */
     public int checkIfDeckIsComplete() {
         int completePoints = 0;     // 13 is full
-        int actualSuit = pile.get(0).getSuit();;
+        int actualSuit = pile.get(0).getSuit();
         int actualCardValue = 13;
         int limit = pile.size();
         for (int i = 0; i < limit; i++) {
             Card card = pile.get(i);
             // KING begins sequence
-            if(card.getRank() == 13) {
+            if(card.getRank() == 13 && actualCardValue == 13) {
                 actualSuit = card.getSuit();
                 completePoints++;
                 actualCardValue--;

@@ -42,10 +42,7 @@ public class Game extends JFrame {
     private JMenu menu = new JMenu("Game");
     JMenuItem restartGame;
 
-    // TODO nie zawsze działa składanie talii zdj na pulpicie
-
     // TODO rozdzielić losowość
-    // TODO zrobić automatycze odstepy pomiedzy kartami np jeśli stos jest duży
 
 
     // TODO
@@ -76,8 +73,15 @@ public class Game extends JFrame {
         // TODO DEBUG
 //        Card card;
 //        CardsPile debug1 = allPiles.get(0);
-//////        debug1.addCard(cards.get(new CardID(2, 1)).getUnlockedAndVisible());
-//        for (int i = 13; i > 1; i -= 1) {
+////        for (int i = 13; i > 1; i -= 1) {
+////            card = (Card) cards.get(new CardID(1, i)).clone();
+////            debug1.addCard(card.getUnlockedAndVisible());
+////        }
+////        for (int i = 13; i > 1; i -= 1) {
+////            card = (Card) cards.get(new CardID(1, i)).clone();
+////            debug1.addCard(card.getUnlockedAndVisible());
+////        }
+//        for (int i = 11; i > 5; i -= 1) {
 //            card = (Card) cards.get(new CardID(1, i)).clone();
 //            debug1.addCard(card.getUnlockedAndVisible());
 //        }
@@ -211,7 +215,7 @@ public class Game extends JFrame {
      * Resets actual game and starts new
      */
     public void restartGame() {
-        if(moves == 0)
+        if(moves == 0 && drawPile.size() == 52)
             return;
 
         if (JOptionPane.showConfirmDialog(null, "Are you sure you want to restart this game from the beginning?", "Restart",
