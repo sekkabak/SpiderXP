@@ -41,9 +41,6 @@ public class CustomMouseAdapter extends MouseAdapter {
             }
         }
 
-        // check for tip
-        // TODO
-
         game.dragPile.translate(x - lastX - (Card.cardWidth / 2), y - lastY - 10);
         lastX = x - (Card.cardWidth / 2);
         lastY = y - 10;
@@ -95,6 +92,7 @@ public class CustomMouseAdapter extends MouseAdapter {
                     }
                     if(game.finishedPile.isAllDone())
                     {
+                        gamePanel.repaint();
                         game.victory();
                     }
 

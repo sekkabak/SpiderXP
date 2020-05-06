@@ -125,7 +125,7 @@ public class CardsPile implements Cloneable {
             if (!card.isLocked() && card.contains(x, y)) {
                 // We take all cards to oposite direction then loop
 
-                List<Card> tmpPile = new ArrayList<Card>();
+                List<Card> tmpPile = new ArrayList<>();
                 // Just one cart from beginning
                 if (i == pileSize - 1) {
                     tmpPile.add(card);

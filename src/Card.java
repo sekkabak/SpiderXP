@@ -23,10 +23,6 @@ public class Card extends Rectangle {
         this.locked = true;
     }
 
-    public CardID getId() {
-        return id;
-    }
-
     public BufferedImage getImage() {
         return isFaceDown ? backImage : image;
     }

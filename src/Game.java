@@ -28,7 +28,7 @@ public class Game extends JFrame {
     public CardsPile dragPile = new CardsPile(0, 0);
     public FinishedPile finishedPile = new FinishedPile(Game.windowWidth, Game.windowHeight);
 
-    public Stack<GameState> gameStateStack = new Stack<GameState>();
+    public Stack<GameState> gameStateStack = new Stack<>();
     public GameState actualState = null;
 
     public long moves = 0;
@@ -36,21 +36,13 @@ public class Game extends JFrame {
 
     public int difficulty = 5; // 2,3,5
 
-    private Actions actions;
+    private final Actions actions;
 
-    private JMenuBar menuBar = new JMenuBar();
-    private JMenu menu = new JMenu("Game");
+    private final JMenuBar menuBar = new JMenuBar();
+    private final JMenu menu = new JMenu("Game");
     JMenuItem restartGame;
     JMenuItem undo;
 
-    // TODO rozdzielić losowość
-
-    // TODO za wcześnie pojawia się victory
-
-    // TODO
-//    long start = System.nanoTime();
-//    long elapsedTime = System.nanoTime() - start;
-//    System.out.println("Czas: " + (elapsedTime * 0.000000001) + "s");
 
     public Game() {
         generateCards();
@@ -73,34 +65,7 @@ public class Game extends JFrame {
         generatePiles();
 
         // TODO DEBUG
-        {
-//        Card card;
-//        CardsPile debug1 = allPiles.get(0);
-////        for (int i = 13; i > 1; i -= 1) {
-////            card = (Card) cards.get(new CardID(1, i)).clone();
-////            debug1.addCard(card.getUnlockedAndVisible());
-////        }
-////        for (int i = 13; i > 1; i -= 1) {
-////            card = (Card) cards.get(new CardID(1, i)).clone();
-////            debug1.addCard(card.getUnlockedAndVisible());
-////        }
-////        for (int i = 11; i > 5; i -= 1) {
-////            card = (Card) cards.get(new CardID(1, i)).clone();
-////            debug1.addCard(card.getUnlockedAndVisible());
-////        }
-//        card = (Card) cards.get(new CardID(1, 13)).clone();
-//        debug1.addCard(card.getUnlockedAndVisible());
-//        for (int i = 13; i > 1; i -= 1) {
-//            card = (Card) cards.get(new CardID(1, i)).clone();
-//            debug1.addCard(card.getUnlockedAndVisible());
-//        }
-//        CardsPile debug2 = allPiles.get(1);
-//        card = (Card) cards.get(new CardID(1, 1)).clone();
-//        debug2.addCard(card.getUnlockedAndVisible());
-//        CardsPile debug3 = allPiles.get(2);
-//        card = (Card) cards.get(new CardID(2, 2)).clone();
-//        debug3.addCard(card.getUnlockedAndVisible());
-        }
+//        Helper.createDebugPiles(this);
 
         setVisible(true);
         openDifficultyDialog();
@@ -391,7 +356,7 @@ public class Game extends JFrame {
     }
 
     public void saveState() {
-        if(actualState != null) {
+        if (actualState != null) {
             gameStateStack.push(actualState);
             undo.setEnabled(true);
         }
@@ -413,8 +378,8 @@ public class Game extends JFrame {
         finishedPile = state.getFinishedPile();
         moves = state.getMoves();
         points = state.getPoints();
-        moves+=2;
-        points-=2;
+        moves += 2;
+        points -= 2;
 
         restartGame.setEnabled(moves != 0 || drawPile.size() != 52);
         undo.setEnabled(!gameStateStack.isEmpty());
