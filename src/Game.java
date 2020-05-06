@@ -413,6 +413,8 @@ public class Game extends JFrame {
         finishedPile = state.getFinishedPile();
         moves = state.getMoves();
         points = state.getPoints();
+        moves+=2;
+        points-=2;
 
         restartGame.setEnabled(moves != 0 || drawPile.size() != 52);
         undo.setEnabled(!gameStateStack.isEmpty());
