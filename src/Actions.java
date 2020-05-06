@@ -28,6 +28,13 @@ public class Actions {
         }
     };
 
+    Action undo = new AbstractAction("Undo") {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            game.undo();
+        }
+    };
+
     Action deal = new AbstractAction("Deal Next Row") {
         @Override
         public void actionPerformed(ActionEvent e) {

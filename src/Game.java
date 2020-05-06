@@ -2,9 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 
 public class Game extends JFrame {
@@ -30,9 +28,11 @@ public class Game extends JFrame {
     public CardsPile dragPile = new CardsPile(0, 0);
     public FinishedPile finishedPile = new FinishedPile(Game.windowWidth, Game.windowHeight);
 
+    public Stack<GameState> gameStateStack = new Stack<GameState>();
+    public GameState actualState = null;
+
     public long moves = 0;
     public long points = 0;
-    public boolean canRestart = false;
 
     public int difficulty = 5; // 2,3,5
 
@@ -41,9 +41,11 @@ public class Game extends JFrame {
     private JMenuBar menuBar = new JMenuBar();
     private JMenu menu = new JMenu("Game");
     JMenuItem restartGame;
+    JMenuItem undo;
 
     // TODO rozdzielić losowość
 
+    // TODO za wcześnie pojawia się victory
 
     // TODO
 //    long start = System.nanoTime();
@@ -71,17 +73,9 @@ public class Game extends JFrame {
         generatePiles();
 
         // TODO DEBUG
-//        Card card;
-//        CardsPile debug1 = allPiles.get(0);
-////        for (int i = 13; i > 1; i -= 1) {
-////            card = (Card) cards.get(new CardID(1, i)).clone();
-////            debug1.addCard(card.getUnlockedAndVisible());
-////        }
-////        for (int i = 13; i > 1; i -= 1) {
-////            card = (Card) cards.get(new CardID(1, i)).clone();
-////            debug1.addCard(card.getUnlockedAndVisible());
-////        }
-//        for (int i = 11; i > 5; i -= 1) {
+        Card card;
+        CardsPile debug1 = allPiles.get(0);
+//        for (int i = 13; i > 1; i -= 1) {
 //            card = (Card) cards.get(new CardID(1, i)).clone();
 //            debug1.addCard(card.getUnlockedAndVisible());
 //        }
@@ -89,12 +83,22 @@ public class Game extends JFrame {
 //            card = (Card) cards.get(new CardID(1, i)).clone();
 //            debug1.addCard(card.getUnlockedAndVisible());
 //        }
-//        CardsPile debug2 = allPiles.get(1);
-//        card = (Card) cards.get(new CardID(1, 1)).clone();
-//        debug2.addCard(card.getUnlockedAndVisible());
-//        CardsPile debug3 = allPiles.get(2);
-//        card = (Card) cards.get(new CardID(2, 2)).clone();
-//        debug3.addCard(card.getUnlockedAndVisible());
+//        for (int i = 11; i > 5; i -= 1) {
+//            card = (Card) cards.get(new CardID(1, i)).clone();
+//            debug1.addCard(card.getUnlockedAndVisible());
+//        }
+        card = (Card) cards.get(new CardID(1, 13)).clone();
+        debug1.addCard(card.getUnlockedAndVisible());
+        for (int i = 13; i > 1; i -= 1) {
+            card = (Card) cards.get(new CardID(1, i)).clone();
+            debug1.addCard(card.getUnlockedAndVisible());
+        }
+        CardsPile debug2 = allPiles.get(1);
+        card = (Card) cards.get(new CardID(1, 1)).clone();
+        debug2.addCard(card.getUnlockedAndVisible());
+        CardsPile debug3 = allPiles.get(2);
+        card = (Card) cards.get(new CardID(2, 2)).clone();
+        debug3.addCard(card.getUnlockedAndVisible());
 
         setVisible(true);
         openDifficultyDialog();
@@ -110,7 +114,7 @@ public class Game extends JFrame {
     private void setMenu() {
         JMenuItem newGame = new JMenuItem("New Game", KeyEvent.VK_F2);
         restartGame = new JMenuItem("Restart This Game");
-        JMenuItem undo = new JMenuItem("Undo");
+        undo = new JMenuItem("Undo");
         JMenuItem deal = new JMenuItem("Deal Next Row");
         JMenuItem tip = new JMenuItem("Show An Available Move");
         JMenuItem difficulty = new JMenuItem("Difficulty...");
@@ -128,7 +132,9 @@ public class Game extends JFrame {
 
         restartGame.setAction(actions.restartGame);
 
+        undo.setAction(actions.undo);
         undo.setEnabled(false);
+        undo.setAccelerator(KeyStroke.getKeyStroke('Z', Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 
         deal.setAction(actions.deal);
 
@@ -207,6 +213,9 @@ public class Game extends JFrame {
         // deal rest cards
         dealTheCards();
 
+        clearHistory();
+        saveState();
+
         // repaint board
         panel.repaint();
     }
@@ -215,7 +224,7 @@ public class Game extends JFrame {
      * Resets actual game and starts new
      */
     public void restartGame() {
-        if(moves == 0 && drawPile.size() == 52)
+        if (moves == 0 && drawPile.size() == 52)
             return;
 
         if (JOptionPane.showConfirmDialog(null, "Are you sure you want to restart this game from the beginning?", "Restart",
@@ -242,6 +251,9 @@ public class Game extends JFrame {
 
         // deal rest cards
         dealTheCards();
+
+        clearHistory();
+        saveState();
 
         // repaint board
         panel.repaint();
@@ -348,6 +360,7 @@ public class Game extends JFrame {
         }
 
         restartGame.setEnabled(true);
+        saveState();
         panel.repaint();
     }
 
@@ -365,11 +378,43 @@ public class Game extends JFrame {
     }
 
     public void makeMove() {
-        if(moves == 0)
+        if (moves == 0)
             restartGame.setEnabled(true);
 
         moves++;
-        if(points>0)
+        if (points > 0)
             points--;
+
+        saveState();
+    }
+
+    public void saveState() {
+        if(actualState != null) {
+            gameStateStack.push(actualState);
+            undo.setEnabled(true);
+        }
+
+        actualState = new GameState(allPiles, drawPile, finishedPile, moves, points);
+    }
+
+    public void clearHistory() {
+        gameStateStack.clear();
+        actualState = null;
+        undo.setEnabled(false);
+    }
+
+    public void undo() {
+        actualState = null;
+        GameState state = gameStateStack.pop();
+        allPiles = state.getAllPiles();
+        drawPile = state.getDrawPile();
+        finishedPile = state.getFinishedPile();
+        moves = state.getMoves();
+        points = state.getPoints();
+
+        restartGame.setEnabled(moves != 0 || drawPile.size() != 52);
+        undo.setEnabled(!gameStateStack.isEmpty());
+        saveState();
+        panel.repaint();
     }
 }

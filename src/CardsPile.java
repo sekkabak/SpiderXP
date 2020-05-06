@@ -2,8 +2,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CardsPile {
-    protected final List<Card> pile;
+public class CardsPile implements Cloneable {
+    protected List<Card> pile;
     protected final int pileOffset = 7;
     public int x, y;
 
@@ -39,7 +39,7 @@ public class CardsPile {
 
     public void paintPile(Graphics g) {
         int offset = 0;
-        int faceDownOffset = 22-(pile.size()*2)/5;
+        int faceDownOffset = 22 - (pile.size() * 2) / 5;
         boolean lastFaceDown = true;
         for (Card card : pile) {
             card.x = this.x;
@@ -101,7 +101,6 @@ public class CardsPile {
     /**
      * Fixes pile when
      * - Top card is locked and hidden
-     *
      */
     public void fixPile() {
         Card topCard = getLastCard();
@@ -150,42 +149,70 @@ public class CardsPile {
     /**
      * Checks if deck was complited in this pile then remove it and returns suit id
      *
-     * @return suit id
+     * @return suit id or -1 when deck is not full
      */
     public int checkIfDeckIsComplete() {
-        int completePoints = 0;     // 13 is full
-        int actualSuit = pile.get(0).getSuit();
-        int actualCardValue = 13;
-        int limit = pile.size();
-        for (int i = 0; i < limit; i++) {
+        // minimum length for deck
+        int pileSize = size();
+        if (pileSize < 13)
+            return -1;
+
+        int i;
+        int prevSuit = -1;
+        int sequenceScore = 13;
+        for (i = 0; i < pileSize; i++) {
             Card card = pile.get(i);
-            // KING begins sequence
-            if(card.getRank() == 13 && actualCardValue == 13) {
-                actualSuit = card.getSuit();
-                completePoints++;
-                actualCardValue--;
-            }
-            // rest of cards from 12 to 1
-            else if (card.getRank() == actualCardValue && card.getSuit() == actualSuit) {
-                completePoints++;
-                actualCardValue--;
-            }
-            // sequence break
-            else {
-                completePoints = 0;
-                actualCardValue = 13;
+
+            // different color
+            if(card.getSuit() != prevSuit) {
+                prevSuit = card.getSuit();
+                sequenceScore = 13;
             }
 
-            if (completePoints == 13) {
-                while (true) {
-                    card = pile.remove(i);
-                    if (card.getRank() == 13)
-                        return actualSuit;
-                    i--;
-                }
+            // card in proper sequence
+            if (card.getRank() == sequenceScore) {
+                sequenceScore--;
             }
+            // begin new sequence with king
+            else if(card.getRank() == 13) {
+                sequenceScore = 12;
+            }
+            // reset sequence
+            else {
+                sequenceScore = 13;
+            }
+
+            // sequence is complete
+            if(sequenceScore == 0)
+                break;
+        }
+
+        // remove cards from pile
+        if(sequenceScore == 0) {
+            for (int j = 13; j > 0; j--, i--) {
+                pile.remove(i);
+            }
+
+            return prevSuit;
         }
 
         return -1;
+    }
+
+    @Override
+    public CardsPile clone() {
+        try {
+            CardsPile clone = (CardsPile) super.clone();
+            List<Card> clonedPile = new ArrayList<>();
+            for (Card card : clone.pile) {
+                Card x = (Card) card.clone();
+                clonedPile.add(x);
+            }
+
+            clone.pile = clonedPile;
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }
