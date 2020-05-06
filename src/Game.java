@@ -73,32 +73,34 @@ public class Game extends JFrame {
         generatePiles();
 
         // TODO DEBUG
-        Card card;
-        CardsPile debug1 = allPiles.get(0);
+        {
+//        Card card;
+//        CardsPile debug1 = allPiles.get(0);
+////        for (int i = 13; i > 1; i -= 1) {
+////            card = (Card) cards.get(new CardID(1, i)).clone();
+////            debug1.addCard(card.getUnlockedAndVisible());
+////        }
+////        for (int i = 13; i > 1; i -= 1) {
+////            card = (Card) cards.get(new CardID(1, i)).clone();
+////            debug1.addCard(card.getUnlockedAndVisible());
+////        }
+////        for (int i = 11; i > 5; i -= 1) {
+////            card = (Card) cards.get(new CardID(1, i)).clone();
+////            debug1.addCard(card.getUnlockedAndVisible());
+////        }
+//        card = (Card) cards.get(new CardID(1, 13)).clone();
+//        debug1.addCard(card.getUnlockedAndVisible());
 //        for (int i = 13; i > 1; i -= 1) {
 //            card = (Card) cards.get(new CardID(1, i)).clone();
 //            debug1.addCard(card.getUnlockedAndVisible());
 //        }
-//        for (int i = 13; i > 1; i -= 1) {
-//            card = (Card) cards.get(new CardID(1, i)).clone();
-//            debug1.addCard(card.getUnlockedAndVisible());
-//        }
-//        for (int i = 11; i > 5; i -= 1) {
-//            card = (Card) cards.get(new CardID(1, i)).clone();
-//            debug1.addCard(card.getUnlockedAndVisible());
-//        }
-        card = (Card) cards.get(new CardID(1, 13)).clone();
-        debug1.addCard(card.getUnlockedAndVisible());
-        for (int i = 13; i > 1; i -= 1) {
-            card = (Card) cards.get(new CardID(1, i)).clone();
-            debug1.addCard(card.getUnlockedAndVisible());
+//        CardsPile debug2 = allPiles.get(1);
+//        card = (Card) cards.get(new CardID(1, 1)).clone();
+//        debug2.addCard(card.getUnlockedAndVisible());
+//        CardsPile debug3 = allPiles.get(2);
+//        card = (Card) cards.get(new CardID(2, 2)).clone();
+//        debug3.addCard(card.getUnlockedAndVisible());
         }
-        CardsPile debug2 = allPiles.get(1);
-        card = (Card) cards.get(new CardID(1, 1)).clone();
-        debug2.addCard(card.getUnlockedAndVisible());
-        CardsPile debug3 = allPiles.get(2);
-        card = (Card) cards.get(new CardID(2, 2)).clone();
-        debug3.addCard(card.getUnlockedAndVisible());
 
         setVisible(true);
         openDifficultyDialog();
