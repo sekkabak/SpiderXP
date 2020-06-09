@@ -1,5 +1,9 @@
 import java.awt.*;
 
+/**
+ * Klasa obsługująca kupkę do której wpadają złożone już karty
+ * @see CardsPile
+ */
 public class FinishedPile extends CardsPile {
     protected final int pileOffset = 50;
 

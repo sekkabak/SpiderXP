@@ -2,6 +2,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Model danych stanu gry
+ * Zapisywany jest na stosie stanów gry używanych w cofaniu
+ * Zawiera kopię wszystkich danych gry
+ * np. wszystkie karty na kupkach, kupki, punkty, ruchy
+ */
 public class GameState {
     private final List<CardsPile> allPiles = new ArrayList<>();
     private final DrawPile drawPile;

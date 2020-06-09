@@ -1,5 +1,9 @@
 import java.awt.*;
 
+/**
+ * Klasa obsługująca kupkę z której dobieramy karty
+ * @see CardsPile
+ */
 public class DrawPile extends CardsPile {
     protected final int pileOffset = 12;
 

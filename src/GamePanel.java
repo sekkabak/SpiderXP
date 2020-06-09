@@ -1,6 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Klasa dziedzicząca z JPanel spersonalizowana dla tej gry
+ * dodaje mouse listenera oraz rysowanie wszystkich obiektów
+ */
 public class GamePanel extends JPanel {
     protected Game game;
 
@@ -35,6 +39,9 @@ public class GamePanel extends JPanel {
         game.dragPile.paintPile(g);
     }
 
+    /**
+     * Rysuje kwadraty na pustych miejscach kupek
+     */
     private void paintPilesHolders(Graphics g) {
         g.setColor(Color.gray);
         for (int i = 0; i < 10; i++) {

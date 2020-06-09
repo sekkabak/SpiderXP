@@ -1,6 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Klasa okienka zmiany poziomu trudności
+ */
 public class DifficultyDialog {
     JRadioButton easy, medium, hard;
     Game game;
@@ -10,6 +13,10 @@ public class DifficultyDialog {
         this.game = game;
     }
 
+    /**
+     * Otwiera okno dialogu oraz przypisuje
+     * dynamiczną zmianę wartości do przycisków
+     */
     public void changeDifficulty() {
         final JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(3, 1));

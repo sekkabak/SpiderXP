@@ -5,6 +5,9 @@ import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
 
+/**
+ * Główny obiekt zarządzający grą oraz przetrzymujący dane
+ */
 public class Game extends JFrame {
     public static final int windowWidth = 1150;
     public static final int windowHeight = 700;
@@ -76,7 +79,7 @@ public class Game extends JFrame {
     }
 
     /**
-     * Configures menubar for game
+     * Konfiguruje menubar gry
      */
     private void setMenu() {
         JMenuItem newGame = new JMenuItem("New Game", KeyEvent.VK_F2);
@@ -142,7 +145,8 @@ public class Game extends JFrame {
     }
 
     /**
-     * Generates all cards for future coping etc
+     * Generuje wszystkie możliwe karty do późniejszego klonowania
+     * co zmniejsza znacząco czas otwierania nowej gry oraz samej aplikacji
      */
     private void generateCards() {
         // i card type
@@ -163,7 +167,7 @@ public class Game extends JFrame {
     }
 
     /**
-     * Resets actual game and starts new
+     * Czyści stół oraz zaczyna nową grę
      */
     public void newGame() {
         resetMoves();
@@ -188,7 +192,7 @@ public class Game extends JFrame {
     }
 
     /**
-     * Resets actual game and starts new
+     * Resetuje aktualną grę i zaczyna od początku(to samo rozłożenie)
      */
     public void restartGame() {
         if (moves == 0 && drawPile.size() == 52)
@@ -227,7 +231,7 @@ public class Game extends JFrame {
     }
 
     /**
-     * Clears piles used in actual game
+     * Czyści wszystkie kupki kart
      */
     private void clearPiles() {
         gameCards.clear();
@@ -240,7 +244,8 @@ public class Game extends JFrame {
     }
 
     /**
-     * Generates all cards used in game
+     * Kopiuje z wygenerowanych wcześniej obiektów kart
+     * te które będą używane w grze
      */
     private void generateGameCards() {
         // i card type
@@ -263,7 +268,7 @@ public class Game extends JFrame {
     }
 
     /**
-     * Generates main 10 piles for game
+     * Tworzy 10 kupek kart na stole gry
      */
     private void generatePiles() {
         int offsetInterval = Card.cardWidth + pilesSpacing;
@@ -274,7 +279,7 @@ public class Game extends JFrame {
     }
 
     /**
-     * Fills main 10 piles from rest of the shuffled cards
+     * Zapełnia główne 10 kupek z reszty przetasowanych kart
      */
     private void dealTheCards() {
         int limit = gameCards.size();
@@ -290,7 +295,8 @@ public class Game extends JFrame {
     }
 
     /**
-     * Generates pile of cards for drawing from first 50 cards
+     * Wtasowuje 50 pierwszch przetasowanych kart do kupek
+     * z których będą dobierane karty
      */
     private void generateDrawPile() {
         for (int i = 0; i < 50; i++) {
@@ -299,7 +305,7 @@ public class Game extends JFrame {
     }
 
     /**
-     * Check piles for need to reveal top card
+     * Sprawdza kupki czy jest jakaś zakryta karta na szczycie kupki
      */
     public void checkPiles() {
         for (CardsPile cardsPile : allPiles) {
@@ -309,7 +315,8 @@ public class Game extends JFrame {
     }
 
     /**
-     * Deals i pile from DrawPile
+     * Rozdaje karty z kupki do dobierania, zdejmuje z kupki
+     * dobierania 'jedną' kartę oraz rozdaje po jednej karcie na każdę kupkę gracza
      */
     public void makeADeal() {
         if (drawPile.pile.isEmpty())
@@ -332,18 +339,26 @@ public class Game extends JFrame {
     }
 
     /**
-     * Prints end of game dialog
+     * Wyświetla powiadomienie o tym że gracz wygrał
      */
     public void victory() {
         JOptionPane.showMessageDialog(this, "Victory!");
     }
 
+    /**
+     * Resetuje licznik punktów oraz ruchów
+     */
     public void resetMoves() {
         moves = 0;
         points = 500;
         restartGame.setEnabled(false);
     }
 
+    /**
+     * Zmienia punkty
+     * Dodaje punkt ruchu
+     * Odblokowuje resetowanie gry
+     */
     public void makeMove() {
         if (moves == 0)
             restartGame.setEnabled(true);
@@ -355,6 +370,9 @@ public class Game extends JFrame {
         saveState();
     }
 
+    /**
+     * Zapisuje aktualny stan stołu gry do późniejszego cofania
+     */
     public void saveState() {
         if (actualState != null) {
             gameStateStack.push(actualState);
@@ -364,12 +382,19 @@ public class Game extends JFrame {
         actualState = new GameState(allPiles, drawPile, finishedPile, moves, points);
     }
 
+    /**
+     * Usuwa historię gry
+     */
     public void clearHistory() {
         gameStateStack.clear();
         actualState = null;
         undo.setEnabled(false);
     }
 
+    /**
+     * Przywraca ostatni zapisany stan gry
+     * oraz usuwa go z stosu stanów
+     */
     public void undo() {
         actualState = null;
         GameState state = gameStateStack.pop();

@@ -2,6 +2,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
+/**
+ * Klasa obsługująca mysz w grze
+ */
 public class CustomMouseAdapter extends MouseAdapter {
     Game game;
     GamePanel gamePanel;
@@ -16,6 +19,10 @@ public class CustomMouseAdapter extends MouseAdapter {
         this.gamePanel = gamePanel;
     }
 
+    /**
+     * Sprawdza wszystkie warunki dla naciśnięcia myszy
+     * i na tej podstawie wykonuje odpowiednie wywołania
+     */
     @Override
     public void mousePressed(MouseEvent e) {
         super.mousePressed(e);
@@ -48,6 +55,9 @@ public class CustomMouseAdapter extends MouseAdapter {
         gamePanel.repaint();
     }
 
+    /**
+     * Sprawdza czy jakiś przedmiot został poprawnie upuszczony
+     */
     @Override
     public void mouseReleased(MouseEvent e) {
         super.mouseReleased(e);
@@ -113,6 +123,9 @@ public class CustomMouseAdapter extends MouseAdapter {
         gamePanel.repaint();
     }
 
+    /**
+     * Przemieszcze kupkę kart jeśli taka jest w ręce
+     */
     @Override
     public void mouseDragged(MouseEvent e) {
         if (drawed)

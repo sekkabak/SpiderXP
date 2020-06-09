@@ -2,6 +2,10 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+/**
+ * Klasa pomocnicza zawierająca metody statyczne
+ * wykorzystywane w całej aplikacji
+ */
 public class Helper {
     public static BufferedImage loadImage(String fileName) {
         BufferedImage img = null;

@@ -1,3 +1,7 @@
+/**
+ * Model danych odpowiadający za przetrzymywanie informacji o
+ * wartości karty oraz jej kolorze
+ */
 public class CardID {
     /**
      * 1 - spade
