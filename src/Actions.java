@@ -12,10 +12,12 @@ import java.net.URISyntaxException;
 public class Actions {
     final Game game;
     DifficultyDialog difficultyDialog;
+    StatisticsDialog statisticsDialog;
 
     public Actions(Game game) {
         this.game = game;
         difficultyDialog = new DifficultyDialog(this.game);
+        statisticsDialog = new StatisticsDialog(this.game);
     }
 
     /**
@@ -164,4 +166,13 @@ public class Actions {
         }
     };
 
+    /**
+     * Pokazuje okno statystyk
+     */
+    Action statistics = new AbstractAction("Statistics...") {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            statisticsDialog.showStatistics();
+        }
+    };
 }

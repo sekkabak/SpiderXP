@@ -4,8 +4,8 @@ TODO
 -
 - podpowiedzi
 - statystyki
-- zapis gry
+- ~~zapis gry~~
 - dźwięki
-- animacje
+- ~~animacje~~
 - opcje gry
-- zmienić losowość gry
+- ~~zmienić losowość gry~~

@@ -47,10 +47,10 @@ public class DifficultyDialog {
         medium.addActionListener(x -> setDifficulty(3));
         hard.addActionListener(x -> setDifficulty(5));
 
-        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Choose difficulty"));
+        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Select the game difficulty level that you want"));
 
         int result = JOptionPane.showOptionDialog(null, panel, "Choose difficulty", JOptionPane.DEFAULT_OPTION,
-                JOptionPane.INFORMATION_MESSAGE, null, null, null);
+                JOptionPane.PLAIN_MESSAGE, null, null, null);
         if(result == 0) {
             game.difficulty = localDifficulty;
             game.newGame();

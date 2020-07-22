@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 /**
  * Główny obiekt zarządzający grą oraz przetrzymujący dane
@@ -47,11 +48,17 @@ public class Game extends JFrame {
     private final JMenuBar menuBar = new JMenuBar();
     private final JMenu menu = new JMenu("Game");
     private final JMenu help = new JMenu("Help");
-    JMenuItem restartGame;
-    JMenuItem undo;
+    private JMenuItem restartGame;
+    private JMenuItem undo;
 
+    private final Preferences preferences = Preferences.userRoot().node(getName());
+    public final Statistics statistics = new Statistics(preferences);
 
     public Game() {
+        // TODO
+        new StatisticsDialog(this).showStatistics();
+        System.exit(0);
+
         generateCards();
 
         try {
@@ -126,11 +133,14 @@ public class Game extends JFrame {
         difficulty.setAction(actions.difficulty);
         difficulty.setAccelerator(KeyStroke.getKeyStroke("F3"));
 
-        statistics.setEnabled(false);
+
+        // TODO
+//        statistics.setEnabled(false);
         options.setEnabled(false);
 //        save.setEnabled(true);
 //        openSave.setEnabled(false);
 
+        statistics.setAction(actions.statistics);
         save.setAction(actions.save);
         openSave.setAction(actions.openSave);
         gitHub.setAction(actions.gitHub);
@@ -194,22 +204,28 @@ public class Game extends JFrame {
     public void newGame() {
         resetMoves();
 
-        // clears board
+        // jeśli wykonano ruch to dodaj grę jako przegraną
+        if(moves > 0) {
+            statistics.addLose(difficulty);
+            statistics.submitScore(difficulty, points);
+        }
+
+        // czyści stół(wszystkie kupki)
         clearPiles();
 
-        // generates cards for game
+        // generuje karty do aktualnej gry
         generateGameCards();
 
-        // give cards for drawPile
+        // wtasowuje karty do talii z której będą dobierane
         generateDrawPile();
 
-        // deal rest cards
+        // rozdaje resztę kart
         dealTheCards();
 
         clearHistory();
         saveState();
 
-        // repaint board
+        // przemalowuje stół
         panel.repaint();
     }
 
@@ -225,30 +241,35 @@ public class Game extends JFrame {
             return;
         }
 
+        // dodaje przegraną do statystyk
+        statistics.addLose(difficulty);
+        statistics.submitScore(difficulty, points);
+
+        // resetuje historie cofania
         resetMoves();
 
-        // clears board
+        // czyści stół(wszystkie kupki)
         clearPiles();
 
-        // restore previous cards generation
+        // przywraca poprzednią talie kart
         gameCards = new ArrayList<>(gameCardsCopy);
 
-        // give cards for drawPile
+        // wtasowuje karty do talii z której będą dobierane
         generateDrawPile();
 
-        // hide and lock all remaining cards
+        // chowa i blokuje wszystkie pozostałe karty
         for (Card card : gameCards) {
             card.hide();
             card.lock();
         }
 
-        // deal rest cards
+        // rozdaje resztę kart
         dealTheCards();
 
         clearHistory();
         saveState();
 
-        // repaint board
+        // przemalowuje stół
         panel.repaint();
     }
 
@@ -364,6 +385,8 @@ public class Game extends JFrame {
      * Wyświetla powiadomienie o tym że gracz wygrał
      */
     public void victory() {
+        statistics.addWin(difficulty);
+        statistics.submitScore(difficulty, points);
         JOptionPane.showMessageDialog(this, "Victory!");
     }
 
