@@ -19,20 +19,29 @@ public class DifficultyDialog {
      */
     public void changeDifficulty() {
         final JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(3, 1));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
 
-        easy = new JRadioButton("Easy", game.difficulty == 2);
-        medium = new JRadioButton("Medium", game.difficulty == 3);
-        hard = new JRadioButton("Hard", game.difficulty == 5);
+
+        easy = new JRadioButton("Easy: One Suit", game.difficulty == 2);
+        medium = new JRadioButton("Medium: Two Suit", game.difficulty == 3);
+        hard = new JRadioButton("Hard: Four Suits", game.difficulty == 5);
 
         ButtonGroup buttonsGroup = new ButtonGroup();
         buttonsGroup.add(easy);
         buttonsGroup.add(medium);
         buttonsGroup.add(hard);
 
-        panel.add(easy);
-        panel.add(medium);
-        panel.add(hard);
+        JLabel diffLabel = new JLabel();
+        diffLabel.setIcon(new ImageIcon(Helper.loadImage("difficulty.png")));
+        diffLabel.setBackground(Color.RED);
+        panel.add(diffLabel);
+
+        JPanel radioButtonPanel = new JPanel();
+        radioButtonPanel.setLayout(new GridLayout(3, 1));
+        radioButtonPanel.add(easy);
+        radioButtonPanel.add(medium);
+        radioButtonPanel.add(hard);
+        panel.add(radioButtonPanel);
 
         easy.addActionListener(x -> setDifficulty(2));
         medium.addActionListener(x -> setDifficulty(3));
