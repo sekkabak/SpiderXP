@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +8,7 @@ import java.util.List;
  * zawiera metody przenoszące kupkę, sprawdzające czy jest ona już kompletna
  * oraz metody rysującą kupkę kart na stole
  */
-public class CardsPile implements Cloneable {
+public class CardsPile implements Cloneable, Serializable {
     protected List<Card> pile;
     protected final int pileOffset = 7;
     public int x, y;

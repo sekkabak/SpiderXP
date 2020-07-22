@@ -1,8 +1,10 @@
+import java.io.Serializable;
+
 /**
  * Model danych odpowiadający za przetrzymywanie informacji o
  * wartości karty oraz jej kolorze
  */
-public class CardID {
+public class CardID implements Serializable {
     /**
      * 1 - spade
      * 2 - heart

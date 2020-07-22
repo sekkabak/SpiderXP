@@ -1,5 +1,9 @@
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 /**
  * Klasa obiektu karta, używanego do rysowania na stole oraz
@@ -18,12 +22,12 @@ public class Card extends Rectangle {
     /**
      * Przednie zdjęcie karty
      */
-    final private BufferedImage image;
+    transient private BufferedImage image;
 
     /**
      * Tylne zdjęcie karty
      */
-    final private BufferedImage backImage;
+    transient private BufferedImage backImage;
 
     private boolean isFaceDown;
     private boolean locked;
@@ -89,5 +93,10 @@ public class Card extends Rectangle {
     }
     public int getRank() {
         return id.getRank();
+    }
+
+    public void recreateImages() {
+        image = Helper.loadImage(id.hashCode() + ".png");
+        backImage = Game.backImage;
     }
 }

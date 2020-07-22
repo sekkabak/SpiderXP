@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 
@@ -9,6 +10,8 @@ import java.util.List;
  * Główny obiekt zarządzający grą oraz przetrzymujący dane
  */
 public class Game extends JFrame {
+    public static final String gameSavePath = new JFileChooser().getFileSystemView().getDefaultDirectory().toString() + "/SpiderXPsave.dat";
+
     public static final int windowWidth = 1150;
     public static final int windowHeight = 700;
 
@@ -19,7 +22,7 @@ public class Game extends JFrame {
 
     private final GamePanel panel;
 
-    // all cards available in game
+    // wszystkie karty dostępne w grze
     // <suit, rank>
     public HashMap<CardID, Card> cards = new HashMap<>();
 
@@ -43,6 +46,7 @@ public class Game extends JFrame {
 
     private final JMenuBar menuBar = new JMenuBar();
     private final JMenu menu = new JMenu("Game");
+    private final JMenu help = new JMenu("Help");
     JMenuItem restartGame;
     JMenuItem undo;
 
@@ -50,6 +54,13 @@ public class Game extends JFrame {
     public Game() {
         generateCards();
 
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ignored) {
+            // nie ustawiono
+        }
+
+        setTitle("Spider solitaire");
         setMinimumSize(new Dimension(windowWidth, windowHeight));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -117,9 +128,11 @@ public class Game extends JFrame {
 
         statistics.setEnabled(false);
         options.setEnabled(false);
-        save.setEnabled(false);
-        openSave.setEnabled(false);
+//        save.setEnabled(true);
+//        openSave.setEnabled(false);
 
+        save.setAction(actions.save);
+        openSave.setAction(actions.openSave);
         gitHub.setAction(actions.gitHub);
         exit.setAction(actions.exit);
 
@@ -141,7 +154,16 @@ public class Game extends JFrame {
         menu.addSeparator();
         menu.add(exit);
 
+        JMenuItem rules = new JMenuItem("Rules");
+        rules.setAction(actions.rules);
+        JMenuItem about = new JMenuItem("About Spider...");
+        about.setAction(actions.about);
+        help.add(rules);
+        help.addSeparator();
+        help.add(about);
+
         menuBar.add(menu);
+        menuBar.add(help);
     }
 
     /**
@@ -410,5 +432,78 @@ public class Game extends JFrame {
         undo.setEnabled(!gameStateStack.isEmpty());
         saveState();
         panel.repaint();
+    }
+
+    /**
+     * Tworzy zapis gry do pliku
+     */
+    public void saveActualGame() {
+        Object[] data = new Object[]{
+                moves,
+                points,
+                difficulty,
+                gameCardsCopy,
+                allPiles,
+                drawPile,
+                dragPile,
+                finishedPile
+        };
+        try {
+            FileOutputStream fos = new FileOutputStream(gameSavePath);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(data);
+            oos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Otwiera zapis gry z pliku
+     */
+    public void openSavedGame() {
+        if (JOptionPane.showConfirmDialog(null, "Are you sure you want to discard the game you are currently playing, and load your previously saved game?", "Spider",
+                JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        clearHistory();
+
+        try {
+            FileInputStream fis = new FileInputStream(gameSavePath);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            Object[] data = (Object[]) ois.readObject();
+            ois.close();
+            moves = (long) data[0];
+            points = (long) data[1];
+            difficulty = (int) data[2];
+
+            //noinspection unchecked
+            gameCardsCopy = (List<Card>) data[3];
+            for (Card card : gameCards) card.recreateImages();
+
+            //noinspection unchecked
+            allPiles = (List<CardsPile>) data[4];
+            for (CardsPile pile : allPiles) recreateImagesInPile(pile);
+
+            drawPile = (DrawPile) data[5];
+            recreateImagesInPile(drawPile);
+
+            dragPile = (CardsPile) data[6];
+            recreateImagesInPile(dragPile);
+
+            finishedPile = (FinishedPile) data[7];
+            recreateImagesInPile(finishedPile);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        panel.repaint();
+    }
+
+    private void recreateImagesInPile(CardsPile pile) {
+        for (Card card : pile.pile) {
+            card.recreateImages();
+        }
     }
 }

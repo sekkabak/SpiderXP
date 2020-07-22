@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -8,7 +9,7 @@ import java.util.Objects;
  * Zawiera kopię wszystkich danych gry
  * np. wszystkie karty na kupkach, kupki, punkty, ruchy
  */
-public class GameState {
+public class GameState implements Serializable {
     private final List<CardsPile> allPiles = new ArrayList<>();
     private final DrawPile drawPile;
     private final FinishedPile finishedPile;
