@@ -55,10 +55,6 @@ public class Game extends JFrame {
     public final Statistics statistics = new Statistics(preferences);
 
     public Game() {
-        // TODO
-        new StatisticsDialog(this).showStatistics();
-        System.exit(0);
-
         generateCards();
 
         try {
@@ -201,14 +197,16 @@ public class Game extends JFrame {
     /**
      * Czyści stół oraz zaczyna nową grę
      */
-    public void newGame() {
-        resetMoves();
-
+    public void newGame(int difficulty) {
         // jeśli wykonano ruch to dodaj grę jako przegraną
         if(moves > 0) {
-            statistics.addLose(difficulty);
-            statistics.submitScore(difficulty, points);
+            statistics.addLose(this.difficulty);
+            statistics.submitScore(this.difficulty, points);
         }
+
+        // zmienia poziom trudności gry i resetuje ruchy
+        this.difficulty = difficulty;
+        resetMoves();
 
         // czyści stół(wszystkie kupki)
         clearPiles();

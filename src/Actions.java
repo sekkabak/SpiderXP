@@ -26,7 +26,7 @@ public class Actions {
     Action newGame = new AbstractAction("New Game") {
         @Override
         public void actionPerformed(ActionEvent e) {
-            game.newGame();
+            game.newGame(game.difficulty);
         }
     };
 

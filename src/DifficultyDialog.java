@@ -52,8 +52,7 @@ public class DifficultyDialog {
         int result = JOptionPane.showOptionDialog(null, panel, "Choose difficulty", JOptionPane.DEFAULT_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null, null, null);
         if(result == 0) {
-            game.difficulty = localDifficulty;
-            game.newGame();
+            game.newGame(localDifficulty);
         }
     }
 

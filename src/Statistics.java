@@ -10,11 +10,13 @@ public class Statistics {
     /**
      * Zwraca wartość zapisanej statystyki na podstawie jej skrótu oraz poziomu trudności<br>
      * <p>
-     * w - wygrane<br>
+     * w  - wygrane<br>
      * sw - streak wygranych<br>
-     * l - przegrane<br>
+     * l  - przegrane<br>
      * sl - streak przegranych<br>
      * hs - high score<br>
+     * s  - typ kolejki(kolejka zwycieztw lub przegranych) 1-wygrana 0-przegrana <br>
+     * sa - liczba wygranych z kolei
      *
      * @return wartość podanej preferencji
      */
@@ -44,6 +46,8 @@ public class Statistics {
             String diff = diffToString(difficulty);
             int actual = preferences.getInt(diff + "-l", 0);
             preferences.putInt(diff + "-l", actual + 1);
+
+            handleStreak(0, diff);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -61,8 +65,38 @@ public class Statistics {
             String diff = diffToString(difficulty);
             int actual = preferences.getInt(diff + "-w", 0);
             preferences.putInt(diff + "-w", actual + 1);
+
+            handleStreak(1, diff);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Obsługuje kolejke wygranych oraz przegranych + zapisuje jej maksymalne wartości
+     *
+     * @param result int 1 - wygrana, 0 - przegrana
+     * @param diff String poziom trudności
+     */
+    private void handleStreak(int result, String diff) {
+        // jeśli wynik gry zgadza się z poprzednim
+        int streakAmount = preferences.getInt(diff + "-sa", 0) + 1;
+        String type = diff + (result == 1 ? "-sw" : "-sl");
+        if (preferences.getInt(diff + "-s", 0) == result) {
+            preferences.putInt(diff + "-sa", streakAmount);
+        } else {
+            // jeśli wynik gry różni się od poprzedniego to zmieniamy kolejkę
+            preferences.putInt(diff + "-s", result);
+            preferences.putInt(diff + "-sa", 1);
+        }
+
+        // zapisujemy wynik kolejki jeśli jest większy niż poprzedni
+        if(preferences.getInt(type, 0) < streakAmount) {
+            preferences.putInt(type, streakAmount);
+        }
+        // pierwsze wystąpienie
+        else if(preferences.getInt(type, 0) == 0) {
+            preferences.putInt(type, 1);
         }
     }
 
@@ -97,6 +131,11 @@ public class Statistics {
             preferences.putInt(diff + "-l", 0);
             preferences.putInt(diff + "-sl", 0);
             preferences.putInt(diff + "-hs", 0);
+
+            // win streak - 1
+            // lose streak - 0
+            preferences.putInt(diff + "-s", 0);
+            preferences.putInt(diff + "-sa", 0);
         }
     }
 
