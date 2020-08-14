@@ -29,6 +29,12 @@ public class CustomMouseAdapter extends MouseAdapter {
         int x = e.getX();
         int y = e.getY();
 
+        // check for hint request in score area
+        if (x > (Game.windowWidth-200)/2 && y > Game.windowHeight-200 && x < (Game.windowWidth-200)/2 + 200 && y < Game.windowHeight-100) {
+            game.tip();
+            return;
+        }
+
         // check for draw request in draw area
         if (x > Game.windowWidth - 175 && y > Game.windowHeight - 175 && x < Game.windowWidth - 25 && y < Game.windowHeight - 45) {
             game.makeADeal();
@@ -88,7 +94,7 @@ public class CustomMouseAdapter extends MouseAdapter {
                 Card a = pile.getLastCard();                // top card from pile
                 Card b = game.dragPile.pile.get(0);         // lower card from hand
                 // check is cards has proper order
-                if (a == null ||  a.getRank() == (b.getRank() + 1)) {
+                if (a == null || a.getRank() == (b.getRank() + 1)) {
                     // move cards from hand to new pile
                     int limit = game.dragPile.size();
                     for (int i = 0; i < limit; i++) {

@@ -235,6 +235,19 @@ public class CardsPile implements Cloneable, Serializable {
         return -1;
     }
 
+    /**
+     * Zwraca pierwszą odblokowaną kartę inaczej tą która można poruszyć w kupce
+     */
+    public Card getFirstUnlocked() {
+        for (Card card : pile) {
+            if(!card.isLocked()) {
+                return card;
+            }
+        }
+
+        return null;
+    }
+
     @Override
     public CardsPile clone() {
         try {

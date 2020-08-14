@@ -22,12 +22,13 @@ public class GamePanel extends JPanel {
         super.paintComponent(g);
 
         g.setColor(Color.BLACK);
-        g.drawRect((Game.windowWidth-200)/2, Game.windowHeight-200,200,100);
+        g.drawRect((Game.windowWidth - 200) / 2, Game.windowHeight - 200, 200, 100);
         g.setColor(new Color(0x075c1d));
-        g.fillRect((Game.windowWidth-200)/2+1, Game.windowHeight-200+1,199,99);
+        g.fillRect((Game.windowWidth - 200) / 2 + 1, Game.windowHeight - 200 + 1, 199, 99);
         g.setColor(Color.WHITE);
-        g.drawString("Score: "+ game.points, (Game.windowWidth-100)/2, Game.windowHeight-150);
-        g.drawString("Moves: "+ game.moves, (Game.windowWidth-100)/2, Game.windowHeight-135);
+        g.setFont(new Font("default", Font.BOLD, 12));
+        g.drawString("Score: " + game.points, (Game.windowWidth - 100) / 2, Game.windowHeight - 150);
+        g.drawString("Moves: " + game.moves, (Game.windowWidth - 100) / 2, Game.windowHeight - 135);
 
         paintPilesHolders(g);
 
@@ -45,7 +46,7 @@ public class GamePanel extends JPanel {
     private void paintPilesHolders(Graphics g) {
         g.setColor(Color.gray);
         for (int i = 0; i < 10; i++) {
-            g.drawRect(i*(Card.cardWidth+40)+42, 7, 65, 90);
+            g.drawRect(i * (Card.cardWidth + 40) + 42, 7, 65, 90);
         }
     }
 }

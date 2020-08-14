@@ -43,6 +43,9 @@ public class Game extends JFrame {
 
     public int difficulty = 5; // 2,3,5
 
+    boolean colorAssurance = true;
+    private final int[] tipIndex = {0, 0};
+
     private final Actions actions;
 
     private final JMenuBar menuBar = new JMenuBar();
@@ -121,9 +124,7 @@ public class Game extends JFrame {
         undo.setAccelerator(KeyStroke.getKeyStroke('Z', Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 
         deal.setAction(actions.deal);
-
-        tip.setEnabled(false);
-
+        tip.setAction(actions.tip);
         difficulty.setMnemonic(KeyEvent.VK_F3);
         actions.difficulty.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_F3);
         difficulty.setAction(actions.difficulty);
@@ -199,7 +200,7 @@ public class Game extends JFrame {
      */
     public void newGame(int difficulty) {
         // jeśli wykonano ruch to dodaj grę jako przegraną
-        if(moves > 0) {
+        if (moves > 0) {
             statistics.addLose(this.difficulty);
             statistics.submitScore(this.difficulty, points);
         }
@@ -411,6 +412,7 @@ public class Game extends JFrame {
             points--;
 
         saveState();
+        resetHintIndex();
     }
 
     /**
@@ -431,6 +433,7 @@ public class Game extends JFrame {
     public void clearHistory() {
         gameStateStack.clear();
         actualState = null;
+        resetHintIndex();
         undo.setEnabled(false);
     }
 
@@ -526,5 +529,89 @@ public class Game extends JFrame {
         for (Card card : pile.pile) {
             card.recreateImages();
         }
+    }
+
+    public void tip() {
+        // jeśli podpowiedź w poprawnych kolorach się nie powiodła
+        if(!tipSearch(colorAssurance)) {
+            colorAssurance = !colorAssurance;
+            if(!tipSearch(colorAssurance)) {
+                if(!tipSearch(!colorAssurance)) {
+                    // TODO
+                    System.out.println("Brak podpowiedzi");
+                }
+            }
+        }
+    }
+
+    private boolean tipSearch(boolean colorAssurance) {
+        int i = tipIndex[0];
+        int j = tipIndex[1];
+
+        for (; i < allPiles.size(); i++) {
+            CardsPile pile = allPiles.get(i);
+
+            // ominięcie pustej kupki
+            if (pile.size() == 0) continue;
+
+            Card card = pile.getFirstUnlocked();
+            if (card == null) {
+                new Exception("Któraś z kupek jest błędna").printStackTrace();
+                return false;
+            }
+
+            for (; j < allPiles.size(); j++) {
+                CardsPile card2Pile = allPiles.get(j);
+
+                // ominięcie tej samej kupki oraz pustej kupki
+                if (j == i) continue;
+
+                // jeśli kupka jest pusta to każda karta może zostać tam położona
+                if (card2Pile.size() == 0) {
+                    tipIndex[0] = i;
+                    tipIndex[1] = ++j;
+
+                    CardID id = new CardID(1, 1);
+                    Card newCard = new Card(id, Game.backImage, Game.backImage);
+                    newCard.hide();
+                    new Hint(this, newCard, pile, pile.pile.indexOf(card), card2Pile);
+                    return true;
+                }
+
+                // sprawdzanie czy kupka się nadaje
+                Card card2 = card2Pile.getLastCard();
+
+                // sprawdzenie poprawności koloru
+                if(colorAssurance && card2.getSuit() != card.getSuit()) {
+                    continue;
+                }
+                // wyrzucenie identycznych kolorów kiedy są one nie sprawdzane
+                else if(!colorAssurance && card2.getSuit() == card.getSuit()) {
+                    continue;
+                }
+
+                // sprawdzenie poprawności ruchu
+                if (card2.getRank() == (card.getRank() + 1)) {
+//                    System.out.print("Kopka: " + (i + 1) + " na kopke: " + (j + 1) + " ==== ");
+//                    System.out.print(card.getRank());
+//                    System.out.print(" na ");
+//                    System.out.print(card2.getRank());
+//                    System.out.print("\n");
+                    tipIndex[0] = i;
+                    tipIndex[1] = ++j;
+                    new Hint(this, card2, pile, pile.pile.indexOf(card));
+                    return true;
+                }
+            }
+            tipIndex[1] = j = 0;
+        }
+        tipIndex[0] = 0;
+        return false;
+    }
+
+    private void resetHintIndex() {
+        tipIndex[0] = 0;
+        tipIndex[1] = 0;
+        colorAssurance = true;
     }
 }

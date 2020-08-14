@@ -175,4 +175,11 @@ public class Actions {
             statisticsDialog.showStatistics();
         }
     };
+
+    Action tip = new AbstractAction("Show An Available Move") {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            game.tip();
+        }
+    };
 }
