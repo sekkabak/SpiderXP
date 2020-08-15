@@ -146,12 +146,8 @@ public class Game extends JFrame {
         difficulty.setAction(actions.difficulty);
         difficulty.setAccelerator(KeyStroke.getKeyStroke("F3"));
 
-
         // TODO
-//        statistics.setEnabled(false);
         options.setEnabled(false);
-//        save.setEnabled(true);
-//        openSave.setEnabled(false);
 
         statistics.setAction(actions.statistics);
         save.setAction(actions.save);
@@ -541,9 +537,8 @@ public class Game extends JFrame {
             dragPile = (CardsPile) data[6];
             recreateImagesInPile(dragPile);
 
-            // TODO
-//            finishedPile = (FinishedPile) data[7];
-//            recreateImagesInPile(finishedPile);
+            finishedPile = (FinishedPile) data[7];
+            recreateImagesInPile(finishedPile);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
