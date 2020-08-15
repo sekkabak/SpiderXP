@@ -1,11 +1,12 @@
-Gra pasjans pająk wzorowana na grze stworzonej przez firmę Microsoft
+# Spider Solitaire game modelled on Microsoft's original game
 
-TODO
--
-- ~~zmienić losowość gry~~
-- ~~zapis gry~~
-- ~~statystyki~~
-- ~~podpowiedzi~~
-- dźwięki
-- animacje
-- opcje gry
+### TODO:
+- ~~change randomization~~
+- ~~game saveing~~
+- ~~statistics~~
+- ~~hints~~
+- ~~sounds~~
+- game options
+
+### TOFIX:
+- fix animations
