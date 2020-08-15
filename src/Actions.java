@@ -26,6 +26,8 @@ public class Actions {
     Action newGame = new AbstractAction("New Game") {
         @Override
         public void actionPerformed(ActionEvent e) {
+            if(game.gameBlocked) return;
+
             game.newGame(game.difficulty);
         }
     };
@@ -48,6 +50,8 @@ public class Actions {
     Action undo = new AbstractAction("Undo") {
         @Override
         public void actionPerformed(ActionEvent e) {
+            if(game.gameBlocked) return;
+
             game.undo();
         }
     };
@@ -70,6 +74,8 @@ public class Actions {
     Action difficulty = new AbstractAction("Difficulty...") {
         @Override
         public void actionPerformed(ActionEvent e) {
+            if(game.gameBlocked) return;
+
             difficultyDialog.changeDifficulty();
         }
     };

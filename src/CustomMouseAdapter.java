@@ -25,6 +25,8 @@ public class CustomMouseAdapter extends MouseAdapter {
      */
     @Override
     public void mousePressed(MouseEvent e) {
+        if(game.gameBlocked) return;
+
         super.mousePressed(e);
         int x = e.getX();
         int y = e.getY();
@@ -69,6 +71,8 @@ public class CustomMouseAdapter extends MouseAdapter {
      */
     @Override
     public void mouseReleased(MouseEvent e) {
+        if(game.gameBlocked) return;
+
         super.mouseReleased(e);
         if (drawed) {
             drawed = false;
@@ -139,6 +143,8 @@ public class CustomMouseAdapter extends MouseAdapter {
      */
     @Override
     public void mouseDragged(MouseEvent e) {
+        if(game.gameBlocked) return;
+
         if (drawed)
             return;
 

@@ -42,6 +42,8 @@ public class Game extends JFrame {
     public Stack<GameState> gameStateStack = new Stack<>();
     public GameState actualState = null;
 
+    public boolean gameBlocked = false;
+
     public long moves = 0;
     public long points = 0;
 
@@ -385,11 +387,14 @@ public class Game extends JFrame {
             }
         }
 
-        // TODO dzwiek rozdania kart
         for (CardsPile pile : allPiles) {
-            pile.addCard(drawPile.pile.remove(0).getUnlockedAndVisible());
+            panel.animateCardMoving(drawPile.pile.remove(0).getUnlockedAndVisible(), pile);
         }
+        panel.fireAnimation();
+    }
 
+    public void endADeal() {
+        unlockGame();
         restartGame.setEnabled(true);
         saveState();
         panel.repaint();
@@ -552,10 +557,10 @@ public class Game extends JFrame {
             try {
                 tipQueueSemaphore.acquire();
                 // jeśli podpowiedź w poprawnych kolorach się nie powiodła
-                if (!tipSearch(colorAssurance)) {
+                if (tipSearch(colorAssurance)) {
                     colorAssurance = !colorAssurance;
-                    if (!tipSearch(colorAssurance)) {
-                        if (!tipSearch(!colorAssurance)) {
+                    if (tipSearch(colorAssurance)) {
+                        if (tipSearch(!colorAssurance)) {
                             playSound(4);
                             tipQueueSemaphore.release();
                             return;
@@ -583,7 +588,7 @@ public class Game extends JFrame {
             Card card = pile.getFirstUnlocked();
             if (card == null) {
                 new Exception("Któraś z kupek jest błędna").printStackTrace();
-                return false;
+                return true;
             }
 
             for (; j < allPiles.size(); j++) {
@@ -601,7 +606,7 @@ public class Game extends JFrame {
                     Card newCard = new Card(id, Game.backImage, Game.backImage);
                     newCard.hide();
                     new Hint(this, newCard, pile, pile.pile.indexOf(card), tipQueueSemaphore, card2Pile);
-                    return true;
+                    return false;
                 }
 
                 // sprawdzanie czy kupka się nadaje
@@ -621,13 +626,13 @@ public class Game extends JFrame {
                     tipIndex[0] = i;
                     tipIndex[1] = ++j;
                     new Hint(this, card2, pile, pile.pile.indexOf(card), tipQueueSemaphore);
-                    return true;
+                    return false;
                 }
             }
             tipIndex[1] = j = 0;
         }
         tipIndex[0] = 0;
-        return false;
+        return true;
     }
 
     private void resetHintIndex() {
@@ -667,5 +672,17 @@ public class Game extends JFrame {
                 System.err.println(e.getMessage());
             }
         }).start();
+    }
+
+    public void blockGame() {
+        gameBlocked = true;
+        menu.setEnabled(false);
+        help.setEnabled(false);
+    }
+
+    public void unlockGame() {
+        gameBlocked = false;
+        menu.setEnabled(true);
+        help.setEnabled(true);
     }
 }
