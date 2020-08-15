@@ -1,3 +1,6 @@
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -5,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 import java.util.prefs.Preferences;
 
 /**
@@ -45,6 +49,16 @@ public class Game extends JFrame {
 
     boolean colorAssurance = true;
     private final int[] tipIndex = {0, 0};
+    private final Semaphore tipQueueSemaphore = new Semaphore(1);
+
+    private final String[] sounds = {
+            "cardDraw",
+            "cardPick",
+            "cardDrop",
+            "hint",
+            "noHint",
+            "win"
+    };
 
     private final Actions actions;
 
@@ -371,6 +385,7 @@ public class Game extends JFrame {
             }
         }
 
+        // TODO dzwiek rozdania kart
         for (CardsPile pile : allPiles) {
             pile.addCard(drawPile.pile.remove(0).getUnlockedAndVisible());
         }
@@ -386,6 +401,7 @@ public class Game extends JFrame {
     public void victory() {
         statistics.addWin(difficulty);
         statistics.submitScore(difficulty, points);
+        playSound(5);
         JOptionPane.showMessageDialog(this, "Victory!");
     }
 
@@ -532,16 +548,26 @@ public class Game extends JFrame {
     }
 
     public void tip() {
-        // jeśli podpowiedź w poprawnych kolorach się nie powiodła
-        if(!tipSearch(colorAssurance)) {
-            colorAssurance = !colorAssurance;
-            if(!tipSearch(colorAssurance)) {
-                if(!tipSearch(!colorAssurance)) {
-                    // TODO
-                    System.out.println("Brak podpowiedzi");
+        new Thread(() -> {
+            try {
+                tipQueueSemaphore.acquire();
+                // jeśli podpowiedź w poprawnych kolorach się nie powiodła
+                if (!tipSearch(colorAssurance)) {
+                    colorAssurance = !colorAssurance;
+                    if (!tipSearch(colorAssurance)) {
+                        if (!tipSearch(!colorAssurance)) {
+                            playSound(4);
+                            tipQueueSemaphore.release();
+                            return;
+                        }
+                    }
                 }
+
+                playSound(3);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
             }
-        }
+        }).start();
     }
 
     private boolean tipSearch(boolean colorAssurance) {
@@ -574,7 +600,7 @@ public class Game extends JFrame {
                     CardID id = new CardID(1, 1);
                     Card newCard = new Card(id, Game.backImage, Game.backImage);
                     newCard.hide();
-                    new Hint(this, newCard, pile, pile.pile.indexOf(card), card2Pile);
+                    new Hint(this, newCard, pile, pile.pile.indexOf(card), tipQueueSemaphore, card2Pile);
                     return true;
                 }
 
@@ -582,24 +608,19 @@ public class Game extends JFrame {
                 Card card2 = card2Pile.getLastCard();
 
                 // sprawdzenie poprawności koloru
-                if(colorAssurance && card2.getSuit() != card.getSuit()) {
+                if (colorAssurance && card2.getSuit() != card.getSuit()) {
                     continue;
                 }
                 // wyrzucenie identycznych kolorów kiedy są one nie sprawdzane
-                else if(!colorAssurance && card2.getSuit() == card.getSuit()) {
+                else if (!colorAssurance && card2.getSuit() == card.getSuit()) {
                     continue;
                 }
 
                 // sprawdzenie poprawności ruchu
                 if (card2.getRank() == (card.getRank() + 1)) {
-//                    System.out.print("Kopka: " + (i + 1) + " na kopke: " + (j + 1) + " ==== ");
-//                    System.out.print(card.getRank());
-//                    System.out.print(" na ");
-//                    System.out.print(card2.getRank());
-//                    System.out.print("\n");
                     tipIndex[0] = i;
                     tipIndex[1] = ++j;
-                    new Hint(this, card2, pile, pile.pile.indexOf(card));
+                    new Hint(this, card2, pile, pile.pile.indexOf(card), tipQueueSemaphore);
                     return true;
                 }
             }
@@ -613,5 +634,38 @@ public class Game extends JFrame {
         tipIndex[0] = 0;
         tipIndex[1] = 0;
         colorAssurance = true;
+    }
+
+    /**
+     * <p>
+     * Plays sounds<br>
+     * <p>
+     * 0 - "cardDraw"<br>
+     * 1 - "cardPick"<br>
+     * 2 - "cardDrop"<br>
+     * 3 - "hint"<br>
+     * 4 - "noHint"<br>
+     * 5 - "win"<br>
+     * </p>
+     *
+     * @param soundId int index in sounds array
+     */
+    public synchronized void playSound(int soundId) {
+        if (soundId < 0 || soundId >= sounds.length) {
+            new Exception("Dzwięk nie istnieje!").printStackTrace();
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                Clip clip = AudioSystem.getClip();
+                AudioInputStream inputStream = AudioSystem.getAudioInputStream(
+                        Game.class.getResourceAsStream("/sounds/" + sounds[soundId] + ".wav"));
+                clip.open(inputStream);
+                clip.start();
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+        }).start();
     }
 }

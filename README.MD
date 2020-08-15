@@ -5,7 +5,7 @@ TODO
 - ~~zmienić losowość gry~~
 - ~~zapis gry~~
 - ~~statystyki~~
-- podpowiedzi
+- ~~podpowiedzi~~
 - dźwięki
 - animacje
 - opcje gry

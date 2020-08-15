@@ -1,25 +1,29 @@
+import java.util.concurrent.Semaphore;
+
 public class Hint {
     private final Game game;
     private final Card card;
     private final CardsPile pile;
     private final int index;
     private CardsPile emptyPile = null;
+    private Semaphore semaphore = null;
 
     private final int animationSpeed = 300;
 
-    public Hint(Game game, Card card, CardsPile pile, int index) {
+    public Hint(Game game, Card card, CardsPile pile, int index, Semaphore semaphore) {
         this.game = game;
         this.card = card;
         this.pile = pile;
         this.index = index;
+        this.semaphore = semaphore;
 
         invertPile(pile, index);
         game.repaint();
         invertSecondCard();
     }
 
-    public Hint(Game game, Card card, CardsPile pile, int index, CardsPile emptyPile) {
-        this(game, card, pile, index);
+    public Hint(Game game, Card card, CardsPile pile, int index, Semaphore semaphore, CardsPile emptyPile) {
+        this(game, card, pile, index, semaphore);
         this.emptyPile = emptyPile;
     }
 
@@ -50,6 +54,7 @@ public class Hint {
                         if(emptyPile != null)
                             emptyPile.removeCard();
 
+                        semaphore.release();
                         game.repaint();
                     }
                 },

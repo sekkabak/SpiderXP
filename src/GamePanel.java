@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 /**
  * Klasa dziedzicząca z JPanel spersonalizowana dla tej gry
@@ -7,11 +8,13 @@ import java.awt.*;
  */
 public class GamePanel extends JPanel {
     protected Game game;
+    private final BufferedImage backgroundImage;
 
     public GamePanel(Game game) {
         super();
         this.game = game;
 
+        backgroundImage = Helper.loadImage("FELT.bmp");
         CustomMouseAdapter mouseAdapter = new CustomMouseAdapter(this.game, this);
         addMouseListener(mouseAdapter);
         addMouseMotionListener(mouseAdapter);
@@ -20,6 +23,13 @@ public class GamePanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+
+        for (int x = 0; x < (Game.windowWidth / backgroundImage.getWidth()) + 1; x++) {
+            for (int y = 0; y < (Game.windowHeight / backgroundImage.getHeight()) + 1; y++) {
+                g.drawImage(backgroundImage, x * backgroundImage.getWidth(), y * backgroundImage.getHeight(), null);
+            }
+        }
+
 
         g.setColor(Color.BLACK);
         g.drawRect((Game.windowWidth - 200) / 2, Game.windowHeight - 200, 200, 100);

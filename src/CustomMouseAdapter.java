@@ -58,6 +58,9 @@ public class CustomMouseAdapter extends MouseAdapter {
         lastX = x - (Card.cardWidth / 2);
         lastY = y - 10;
 
+        if(!game.dragPile.isEmpty()) {
+            game.playSound(1);
+        }
         gamePanel.repaint();
     }
 
@@ -79,6 +82,8 @@ public class CustomMouseAdapter extends MouseAdapter {
 
         int x = e.getX();
         int y = e.getY();
+
+        game.playSound(2);
 
         // check for good moves
         for (CardsPile pile : game.allPiles) {
