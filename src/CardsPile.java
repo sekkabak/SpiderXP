@@ -28,6 +28,8 @@ public class CardsPile implements Cloneable, Serializable {
     public void addCard(Card card) {
         lockAll();
         card.unlock();
+        card.x = this.x;
+        card.y = getLastCard() == null ? this.y : getLastCard().y + pileOffset;
         pile.add(card);
 
         int pileSize = pile.size();
@@ -187,7 +189,7 @@ public class CardsPile implements Cloneable, Serializable {
      *
      * @return suit id lub -1 jeśli żadna talia nie została złożona
      */
-    public int checkIfDeckIsComplete() {
+    public int checkIfDeckIsComplete(GamePanel panel, CardsPile finishedPile) {
         // minimum length for deck
         int pileSize = size();
         if (pileSize < 13)
@@ -226,7 +228,8 @@ public class CardsPile implements Cloneable, Serializable {
         // remove cards from pile
         if(sequenceScore == 0) {
             for (int j = 13; j > 0; j--, i--) {
-                pile.remove(i);
+                panel.animateCardMoving(pile.remove(i), this, finishedPile);
+//                pile.remove(i);
             }
 
             return prevSuit;

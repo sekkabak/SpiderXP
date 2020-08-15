@@ -344,11 +344,15 @@ public class Game extends JFrame {
         int allPilesSize = allPiles.size();
         // adds each card to his pile and also removes from generated cards pile
         for (int i = limit - 1; i >= 0; i--) {
+            CardsPile pile = allPiles.get(i % allPilesSize);
+            Card card = gameCards.remove(i);
             if (i < 10) {
-                allPiles.get(i % allPilesSize).addCard(gameCards.remove(i).getUnlockedAndVisible());
+                pile.addCard(card.getUnlockedAndVisible());
             } else {
-                allPiles.get(i % allPilesSize).addCard(gameCards.remove(i));
+                pile.addCard(card);
             }
+//            card.x = pile.x;
+//            card.y = pile.y;
         }
     }
 
@@ -388,12 +392,12 @@ public class Game extends JFrame {
         }
 
         for (CardsPile pile : allPiles) {
-            panel.animateCardMoving(drawPile.pile.remove(0).getUnlockedAndVisible(), pile);
+            panel.animateCardMoving(drawPile.pile.remove(0).getUnlockedAndVisible(), drawPile, pile);
         }
         panel.fireAnimation();
     }
 
-    public void endADeal() {
+    public void endAnimation() {
         unlockGame();
         restartGame.setEnabled(true);
         saveState();
@@ -537,8 +541,9 @@ public class Game extends JFrame {
             dragPile = (CardsPile) data[6];
             recreateImagesInPile(dragPile);
 
-            finishedPile = (FinishedPile) data[7];
-            recreateImagesInPile(finishedPile);
+            // TODO
+//            finishedPile = (FinishedPile) data[7];
+//            recreateImagesInPile(finishedPile);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }

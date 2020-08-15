@@ -48,6 +48,8 @@ public class CustomMouseAdapter extends MouseAdapter {
         for (CardsPile pile : game.allPiles) {
             List<Card> selected = pile.getCardsFormCords(x, y);
             if (selected != null) {
+                game.dragPile.x = selected.get(0).x;
+                game.dragPile.y = selected.get(0).y;
                 for (Card card : selected) {
                     game.dragPile.addCard(card);
                 }
@@ -56,9 +58,11 @@ public class CustomMouseAdapter extends MouseAdapter {
             }
         }
 
-        game.dragPile.translate(x - lastX - (Card.cardWidth / 2), y - lastY - 10);
-        lastX = x - (Card.cardWidth / 2);
-        lastY = y - 10;
+
+//        game.dragPile.translate(x - lastX - (Card.cardWidth / 2), y - lastY - 10);
+
+        lastX = game.dragPile.x;
+        lastY = game.dragPile.y;
 
         if(!game.dragPile.isEmpty()) {
             game.playSound(1);
@@ -109,9 +113,11 @@ public class CustomMouseAdapter extends MouseAdapter {
                     for (int i = 0; i < limit; i++) {
                         pile.addCard(game.dragPile.removeFirstCard());
                     }
-                    int suit = pile.checkIfDeckIsComplete();
+                    gamePanel.repaint();
+                    int suit = pile.checkIfDeckIsComplete(gamePanel, game.finishedPile);
                     if (suit != -1) {
                         game.points+=100;
+                        gamePanel.fireAnimation();
                         Card card = (Card) game.cards.get(new CardID(suit, 13)).clone();
                         game.finishedPile.addCard(card.getUnlockedAndVisible());
                     }

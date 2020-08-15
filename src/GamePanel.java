@@ -91,8 +91,8 @@ public class GamePanel extends JPanel {
         }
     }
 
-    public void animateCardMoving(Card card, CardsPile to) {
-        card.translate(game.drawPile.x - Card.cardWidth, game.drawPile.y - Card.cardHeight);
+    public void animateCardMoving(Card card, CardsPile from, CardsPile to) {
+        card.setLocation(from.x, from.y);
         toAnimateCards.add(new AnimatedCard(card, to));
     }
 
@@ -111,7 +111,7 @@ public class GamePanel extends JPanel {
                 if (animatedCards.isEmpty()) {
                     timer.cancel();
                     timer.purge();
-                    game.endADeal();
+                    game.endAnimation();
                 }
 
                 repaint();
@@ -139,9 +139,13 @@ public class GamePanel extends JPanel {
             this.to = to;
 
             Card last = to.getFirstUnlocked();
-
-            destX = last.x;
-            destY = last.y + to.pileOffset;
+            if(last != null) {
+                destX = last.x;
+                destY = last.y + to.pileOffset;
+            } else {
+                destX = to.x;
+                destY = to.y;
+            }
         }
 
         /**
@@ -150,7 +154,9 @@ public class GamePanel extends JPanel {
         public boolean move() {
             // jeśli karta osiągnęła cel to umieszczamy ją na kupce
             if (card.x == destX && card.y == destY) {
-                to.addCard(card);
+                if(to.getClass() != FinishedPile.class) {
+                    to.addCard(card);
+                }
                 return true;
             }
 
