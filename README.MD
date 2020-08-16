@@ -7,6 +7,7 @@
 - ~~hints~~
 - ~~sounds~~
 - game options
+- win animation
 
 ### TOFIX:
 - fix animations
