@@ -1,4 +1,3 @@
-import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.*;
@@ -137,7 +136,7 @@ public class Game extends JFrame {
 
         undo.setAction(actions.undo);
         undo.setEnabled(false);
-        undo.setAccelerator(KeyStroke.getKeyStroke('Z', Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+//        undo.setAccelerator(KeyStroke.getKeyStroke('Z', Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
 
         deal.setAction(actions.deal);
         tip.setAction(actions.tip);
@@ -661,12 +660,12 @@ public class Game extends JFrame {
             return;
         }
 
+
+
         new Thread(() -> {
             try {
                 Clip clip = AudioSystem.getClip();
-                AudioInputStream inputStream = AudioSystem.getAudioInputStream(
-                        Game.class.getResourceAsStream("/sounds/" + sounds[soundId] + ".wav"));
-                clip.open(inputStream);
+                clip.open(Helper.loadSound(sounds[soundId] + ".wav"));
                 clip.start();
             } catch (Exception e) {
                 System.err.println(e.getMessage());

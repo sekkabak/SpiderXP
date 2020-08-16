@@ -1,6 +1,12 @@
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.*;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Klasa pomocnicza zawierająca metody statyczne
@@ -11,12 +17,27 @@ public class Helper {
         BufferedImage img = null;
 
         try {
-            img = ImageIO.read(Helper.class.getResourceAsStream("/images/" + fileName));
+            img = ImageIO.read(Helper.class.getResourceAsStream("images/" + fileName));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
 
         return img;
+    }
+
+    public static AudioInputStream loadSound(String fileName) {
+        AudioInputStream audioStream = null;
+
+        try {
+            InputStream audioSrc = Helper.class.getResourceAsStream("sounds/" + fileName);
+            InputStream bufferedIn = new BufferedInputStream(audioSrc);
+            audioStream = AudioSystem.getAudioInputStream(bufferedIn);
+
+        } catch (UnsupportedAudioFileException | IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return audioStream;
     }
 
     public static void createDebugPiles(Game game) {

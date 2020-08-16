@@ -26,3 +26,4 @@ The whole game is created on Java Swing.
 
 ### TOFIX:
 - fix animations
+- undo shortkey
